@@ -9,6 +9,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function prepareEvironment() {
     addClientsFormSubmitEvent();
+    addTableSorting();
+  }
+
+  function addTableSorting() {
+    const tableHeaders = document.getElementsByClassName('table__header-title');
+    for (const tableHeaderTitle of tableHeaders) {
+      tableHeaderTitle.addEventListener('click', () => {
+        if (tableHeaderTitle.classList.contains('sorted')) {
+          resetSorting();
+          tableHeaderTitle.classList.add('sorted-reverse');
+        } else if (tableHeaderTitle.classList.contains('sorted-reverse')) {
+          resetSorting();
+        } else {
+          resetSorting();
+          tableHeaderTitle.classList.add('sorted');
+        }
+        renderClientsTable(tableViewClientsList);
+      });
+    }
+  }
+
+  function resetSorting() {
+    const tableHeaders = document.getElementsByClassName('table__header-title');
+    for (const tableHeader of tableHeaders) {
+      tableHeader.classList.remove('sorted');
+      tableHeader.classList.remove('sorted-reverse');
+    }
   }
 
   function addClientsFormSubmitEvent() {
@@ -36,14 +63,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function clientMapper(client) {
-    return ({ id: client.id, name: `${client.surname} ${client.name} ${client.lastname}`, createDate: new Date(client.createdAt), updateDate: new Date(client.updatedAt), });
+    return ({ id: client.id, name: `${client.surname} ${client.name} ${client.lastName}`, createDate: new Date(client.createdAt), updateDate: new Date(client.updatedAt), contacts: [], });
   }
 
   function renderClientsTable(clientsList) {
+    const viewClientsList = sortClientsTable(clientsList);
     const table = document.getElementById('clients-table');
     table.innerHTML = '';
 
-    for (const client of clientsList) {
+    for (const client of viewClientsList) {
       const clientElement = createClientElement(client);
       table.append(clientElement);
     }
@@ -65,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const deleteButton = document.createElement('button');
 
     td.classList.add('table__cell');
-    td.classList.add('table__cell_buttons');
+    td.classList.add('table__cell_actions');
     editButton.classList.add('btn');
     editButton.classList.add('btn-success');
     editButton.textContent = 'Изменить';
@@ -86,6 +114,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     tr.append(td);
 
     return tr;
+  }
+
+  function sortClientsTable(clientsList) {
+    let sortedClientsList = [...clientsList];
+    const tableHeaders = document.getElementsByClassName('table__header-title');
+    for (const tableHeader of tableHeaders) {
+      if (tableHeader.classList.contains('sorted')) {
+        sortedClientsList = sortArrayByProperty(clientsList, bindSortValues(tableHeader.id), false);
+      } else if (tableHeader.classList.contains('sorted-reverse')) {
+        sortedClientsList = sortArrayByProperty(clientsList, bindSortValues(tableHeader.id), true);
+      }
+    }
+    return sortedClientsList;
+  }
+
+  function bindSortValues(id) {
+    switch (id) {
+      case 'id-header':
+        return 'id';
+      case 'name-header':
+        return 'name';
+      case 'create-date-header':
+        return 'createDate';
+      case 'update-date-header':
+        return 'updateDate';
+    }
+  }
+
+  function sortArrayByProperty(arr, prop, dir) {
+    const sortedArr = [...arr];
+    return sortedArr.sort((a, b) => (!dir ? a[prop] < b[prop] : a[prop] > b[prop]) ? -1 : 1);
   }
 
   async function saveClientToDataBase(client) {

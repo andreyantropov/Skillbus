@@ -114,6 +114,18 @@ body {
   color: var(--text-grey);
 }
 
+.sorted::after {
+  content: "\2193";
+  padding-left: 5px;
+  color: var(--primary-color);
+}
+
+.sorted-reverse::after {
+  content: "\2191";
+  padding-left: 5px;
+  color: var(--primary-color);
+}
+
 .clients__button-container {
   display: flex;
   justify-content: center;
