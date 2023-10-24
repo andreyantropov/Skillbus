@@ -7,6 +7,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   prepareEvironment();
   renderClientsTable(tableViewClientsList);
 
+  function prepareEvironment() {
+    addClientsFormSubmitEvent();
+  }
+
+  function addClientsFormSubmitEvent() {
+    const clientModal = document.getElementById('clients-modal-form');
+    const clientsForm = document.getElementById('clients-form');
+    clientsForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('id').value;
+      const lastName = document.getElementById('last-name').value.trim();
+      const firstName = document.getElementById('first-name').value.trim();
+      const secondName = document.getElementById('second-name').value.trim();
+
+      const client = await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: [], });
+      tableViewClientsList.push(clientMapper(client));
+
+      clientsForm.reset();
+      clientModal.dispose();
+      renderClientsTable(tableViewClientsList);
+    });
+  }
+
   function getViewClientsList(clientsList) {
     return clientsList.map((client) => clientMapper(client));
   }
@@ -32,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     for (const [key, value] of Object.entries(client)) {
       const td = document.createElement('td');
       td.classList.add('table__cell');
-      td.textContent = preprocessingData(key, value);
+      td.textContent = value;
       tr.append(td);
     }
 
@@ -42,9 +66,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     td.classList.add('table__cell');
     td.classList.add('table__cell_buttons');
-    deleteButton.classList.add('btn');
-    deleteButton.classList.add('btn-success');
-    deleteButton.textContent = 'Изменить';
+    editButton.classList.add('btn');
+    editButton.classList.add('btn-success');
+    editButton.textContent = 'Изменить';
     deleteButton.classList.add('btn');
     deleteButton.classList.add('btn-danger');
     deleteButton.textContent = 'Удалить';
