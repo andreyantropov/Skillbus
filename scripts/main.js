@@ -9,7 +9,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function prepareEvironment() {
     addClientsFormSubmitEvent();
+    addClientsFiltration();
     addTableSorting();
+  }
+
+  function addClientsFormSubmitEvent() {
+    const clientModal = document.getElementById('clients-modal-form');
+    const clientsForm = document.getElementById('clients-form');
+    clientsForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('id').value;
+      const lastName = document.getElementById('last-name').value.trim();
+      const firstName = document.getElementById('first-name').value.trim();
+      const secondName = document.getElementById('second-name').value.trim();
+
+      const client = await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: [], });
+      tableViewClientsList.push(clientMapper(client));
+
+      clientsForm.reset();
+      clientModal.dispose();
+      renderClientsTable(tableViewClientsList);
+    });
   }
 
   function addTableSorting() {
@@ -38,22 +59,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  function addClientsFormSubmitEvent() {
-    const clientModal = document.getElementById('clients-modal-form');
-    const clientsForm = document.getElementById('clients-form');
-    clientsForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const id = document.getElementById('id').value;
-      const lastName = document.getElementById('last-name').value.trim();
-      const firstName = document.getElementById('first-name').value.trim();
-      const secondName = document.getElementById('second-name').value.trim();
-
-      const client = await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: [], });
-      tableViewClientsList.push(clientMapper(client));
-
-      clientsForm.reset();
-      clientModal.dispose();
+  function addClientsFiltration() {
+    const filter = document.getElementById('filter');
+    filter.addEventListener('keyup', async (e) => {
+      clientsList = e.target.value ? await searchClientsInDataBase(e.target.value) : await getClientsFromDataBase();
+      tableViewClientsList = getViewClientsList(clientsList);
       renderClientsTable(tableViewClientsList);
     });
   }
@@ -66,8 +76,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     return ({ id: client.id, name: `${client.surname} ${client.name} ${client.lastName}`, createDate: new Date(client.createdAt), updateDate: new Date(client.updatedAt), contacts: [], });
   }
 
-  function renderClientsTable(clientsList) {
+  async function renderClientsTable(clientsList) {
     const viewClientsList = sortClientsTable(clientsList);
+
     const table = document.getElementById('clients-table');
     table.innerHTML = '';
 
@@ -163,6 +174,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const response = await fetch(`${url}/api/clients`);
     const clientsList = await response.json();
     return clientsList;
+  }
+
+  async function searchClientsInDataBase(filter) {
+    const response = await fetch(`${url}/api/clients?search=${filter}`);
+    const filteredClientsList = await response.json();
+    return filteredClientsList;
   }
 
   function deleteClientFromDataBase(id) {
