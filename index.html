@@ -6,18 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Skillbus - Клиенты</title>
   <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Raleway:ital,wght@0,100;0,400;1,100&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <link rel="stylesheet" href="css/style.css">
-  <script defer src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-    crossorigin="anonymous"></script>
-  <script defer src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   <script defer src="scripts/main.js"></script>
 </head>
 
@@ -27,11 +21,11 @@
       <div class="header__wrapper">
         <a class="header__logo logo" href="#">
           <img src="img/logo.png" alt="Логотип Skillbus">
-          <div class="header__filter input">
-            <label class="input__label hidden" for="filter">Фильтр:</label>
-            <input class="input__control" type="text" name="filter" id="filter" placeholder="Введите запрос">
-          </div>
         </a>
+        <div class="header__filter input">
+          <label class="input__label hidden" for="filter">Фильтр:</label>
+          <input class="input__control form-control" type="text" name="filter" id="filter" placeholder="Введите запрос">
+        </div>
       </div>
     </div>
   </header>
@@ -53,7 +47,14 @@
           <tbody class="table__body">
           </tbody>
         </table>
-        <button class="clients__add-btn btn btn-reset" data-toggle="modal" data-target="#students-modal-form">Добавить клиента</button>
+        <div class="clients__button-container">
+          <button class="clients__add-btn btn btn-reset" type="button" data-bs-toggle="modal" data-bs-target="#clients-modal-form">
+            <svg width="23" height="16" viewBox="0 0 23 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.5 8C16.71 8 18.5 6.21 18.5 4C18.5 1.79 16.71 0 14.5 0C12.29 0 10.5 1.79 10.5 4C10.5 6.21 12.29 8 14.5 8ZM5.5 6V3H3.5V6H0.5V8H3.5V11H5.5V8H8.5V6H5.5ZM14.5 10C11.83 10 6.5 11.34 6.5 14V16H22.5V14C22.5 11.34 17.17 10 14.5 10Z" fill="#9873FF"/>
+            </svg>
+            Добавить клиента
+          </button>
+        </div>
       </div>
     </section>
   </main>
@@ -61,26 +62,33 @@
   <div class="modal fade" id="clients-modal-form" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal__dialog modal-dialog">
       <div class="modal__content modal-content">
+        <div class="modal__header modal-header">
+          <h3 class="modal__title modal-title">Новый клиент</h3>
+          <span class="modal__client-id"></span>
+          <button class="modal__btn-close btn-close" type="button" data-bs-dismiss="modal" aria-label="Кнопка закрытия модального окна"></button>
+        </div>
         <div class="modal__body modal-body">
           <form class="modal__clients-form form" id="clients-form" action="#" method="post">
             <input class="form__hidden" type="hidden" id="id" name="id" value="">
-            <div class="form__group input form-group">
-              <label class="input__label" for="last-name">Фамилия</label>
+            <div class="form__group input form-floating mb-3">
               <input class="input__control form-control" type="text" name="last-name" id="last-name"
                 placeholder="Фамилия*" minlength="2" maxlength="30" required>
+              <label class="input__label" for="last-name">Фамилия*</label>
             </div>
-            <div class="form__group input form-group">
-              <label class="input__label" for="first-name">Имя</label>
+            <div class="form__group input form-floating mb-3">
               <input class="input__control form-control" type="text" name="first-name" id="first-name"
                 placeholder="Имя*" minlength="2" maxlength="30" required>
+              <label class="input__label" for="first-name">Имя*</label>
             </div>
-            <div class="form__group input form-group">
-              <label class="input__label" for="second-name">Отчество</label>
+            <div class="form__group input form-floating mb-3">
               <input class="input__control form-control" type="text" name="second-name" id="second-name"
-                placeholder="Отчество*" minlength="2" maxlength="30">
+                placeholder="Отчество" minlength="2" maxlength="30">
+              <label class="input__label" for="second-name">Отчество</label>
             </div>
-            <button class="form__btn-submit btn btn-reset" type="submit">Сохранить</button>
-            <button class="from__btn-delete btn-link btn-reset">Удалить клиента</button>
+            <div class="form__btn-container">
+              <button class="form__btn-submit btn btn-reset" type="submit">Сохранить</button>
+              <button class="form__btn-delete btn-link btn-reset">Отмена</button>
+            </div>
           </form>
         </div>
       </div>
