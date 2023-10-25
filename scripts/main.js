@@ -8,9 +8,39 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderClientsTable(tableViewClientsList);
 
   function prepareEvironment() {
+    addNewClientEvent();
+    //addClosingModalEvent();
     addClientsFormSubmitEvent();
     addClientsFiltration();
     addTableSorting();
+  }
+
+
+  function addNewClientEvent() {
+    const addButton = document.getElementById('add-client-button');
+    addButton.addEventListener('click', () => {
+      showModelWindow();
+
+      const title = document.getElementById('modal-title');
+      const idSpan = document.getElementById('client-id-span');
+      const cancelButton = document.getElementById('modal-cancel-btn');
+      const deleteButton = document.getElementById('modal-delete-btn');
+
+      title.textContent = 'Новый клиент';
+      idSpan.textContent = '';
+      cancelButton.classList.remove('hidden');
+      deleteButton.classList.add('hidden');
+    });
+  }
+
+  function showModelWindow() {
+    const clientsModal = document.getElementById('clients-modal-form');
+    const clientsModalInstance = new bootstrap.Modal(clientsModal, {});
+    clientsModalInstance.show();
+    clientsModal.addEventListener('hidden.bs.modal', () => {
+      const clientsForm = document.getElementById('clients-form');
+      clientsForm.reset();
+    });
   }
 
   function addClientsFormSubmitEvent() {
@@ -18,7 +48,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     clientsForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      //https://stackoverflow.com/questions/66541564/how-to-hide-bootstrap-5-modal-only-on-success
       const clientsModal = document.getElementById('clients-modal-form');
       const clientsModalInstance = bootstrap.Modal.getInstance(clientsModal);
 
@@ -30,7 +59,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const client = await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: [], });
       tableViewClientsList.push(clientMapper(client));
 
-      clientsForm.reset();
       clientsModalInstance.hide();
 
       renderClientsTable(tableViewClientsList);
@@ -116,6 +144,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     deleteButton.classList.add('btn-danger');
     deleteButton.textContent = 'Удалить';
 
+    editButton.addEventListener('click', () => {
+      showModelWindow();
+
+      const title = document.getElementById('modal-title');
+      const idSpan = document.getElementById('client-id-span');
+      const cancelButton = document.getElementById('modal-cancel-btn');
+      const deleteButton = document.getElementById('modal-delete-btn');
+
+      title.textContent = 'Изменить данные';
+      idSpan.textContent = `ID: ${client.id}`;
+      cancelButton.classList.add('hidden');
+      deleteButton.classList.remove('hidden');
+    });
     deleteButton.addEventListener('click', () => {
       if (!confirm('Вы уверены?')) return;
       const id = client.id;

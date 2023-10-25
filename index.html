@@ -48,7 +48,7 @@
           </tbody>
         </table>
         <div class="clients__button-container">
-          <button class="clients__add-btn btn btn-reset" type="button" data-bs-toggle="modal" data-bs-target="#clients-modal-form">
+          <button class="clients__add-btn btn btn-reset" id="add-client-button">
             <svg width="23" height="16" viewBox="0 0 23 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M14.5 8C16.71 8 18.5 6.21 18.5 4C18.5 1.79 16.71 0 14.5 0C12.29 0 10.5 1.79 10.5 4C10.5 6.21 12.29 8 14.5 8ZM5.5 6V3H3.5V6H0.5V8H3.5V11H5.5V8H8.5V6H5.5ZM14.5 10C11.83 10 6.5 11.34 6.5 14V16H22.5V14C22.5 11.34 17.17 10 14.5 10Z" fill="#9873FF"/>
             </svg>
@@ -63,8 +63,8 @@
     <div class="modal__dialog modal-dialog">
       <div class="modal__content modal-content">
         <div class="modal__header modal-header">
-          <h3 class="modal__title modal-title">Новый клиент</h3>
-          <span class="modal__client-id"></span>
+          <h3 class="modal__title modal-title" id="modal-title">Новый клиент</h3>
+          <span class="modal__client-id" id="client-id-span"></span>
           <button class="modal__btn-close btn-close" type="button" data-bs-dismiss="modal" aria-label="Кнопка закрытия модального окна"></button>
         </div>
         <div class="modal__body modal-body">
@@ -87,7 +87,8 @@
             </div>
             <div class="form__btn-container">
               <button class="form__btn-submit btn btn-reset" type="submit">Сохранить</button>
-              <button class="form__btn-delete btn-link btn-reset" type="reset">Отмена</button>
+              <button class="form__btn-cancel btn-link btn-reset" id="modal-cancel-btn" type="reset">Отмена</button>
+              <button class="form__btn-delete btn-link btn-reset hidden" id="modal-delete-btn" type="reset">Удалить</button>
             </div>
           </form>
         </div>

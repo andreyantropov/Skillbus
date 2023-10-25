@@ -146,9 +146,15 @@ body {
 }
 
 .modal__title {
+  margin-right: 10px;
   font-size: 18px;
   font-weight: 700;
   color: var(--text-black);
+}
+
+.modal__client-id {
+  font-size: 12px;
+  color: var(--text-grey);
 }
 
 .form__btn-container {
@@ -166,6 +172,6 @@ body {
   background-color: var(--primary-color);
 }
 
-.form__btn-delete {
+.btn-link {
   color: var(--text-black);
 }
