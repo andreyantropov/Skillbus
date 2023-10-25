@@ -4,64 +4,43 @@ document.addEventListener('DOMContentLoaded', async () => {
   let clientsList = await getClientsFromDataBase();
   let tableViewClientsList = getViewClientsList(clientsList);
 
-  prepareEvironment();
+  await prepareEvironment();
   renderClientsTable(tableViewClientsList);
 
-  function prepareEvironment() {
+  async function prepareEvironment() {
+    createModalWindow();
     addNewClientEvent();
-    addClientsFormSubmitEvent();
     addClientsFiltration();
     addTableSorting();
   }
 
-
-  function addNewClientEvent() {
-    const addButton = document.getElementById('add-client-button');
-    addButton.addEventListener('click', () => {
-      showModalWindow();
-
-      const title = document.getElementById('modal-title');
-      const idSpan = document.getElementById('client-id-span');
-      const cancelButton = document.getElementById('modal-cancel-btn');
-      const deleteButton = document.getElementById('modal-delete-btn');
-
-      title.textContent = 'Новый клиент';
-      idSpan.textContent = '';
-      cancelButton.classList.remove('hidden');
-      deleteButton.classList.add('hidden');
-    });
-  }
-
-  function showModalWindow() {
+  function createModalWindow() {
     const clientsModal = document.getElementById('clients-modal-form');
     const clientsModalInstance = new bootstrap.Modal(clientsModal, {});
-    clientsModalInstance.show();
     clientsModal.addEventListener('hidden.bs.modal', () => {
       const clientsForm = document.getElementById('clients-form');
       clientsForm.reset();
     });
 
-    const resetButton = document.getElementById('modal-reset-btn');
-    const deleteButton = document.getElementById('modal-delete-btn');
+    const cancelButton = document.getElementById('modal-cancel-btn');
+    cancelButton.addEventListener('click', async () => {
+      const id = document.getElementById('id').value;
+      if (!!id) await deleteClient(id);
+      clientsModalInstance.hide();
+    });
 
-    if (!!resetButton) {
-      resetButton.addEventListener('click', () => {
-        clientsModalInstance.hide();
-      });
-    }
-    if (!!deleteButton) {
-      deleteButton.addEventListener('click', () => {
-        if (!confirm('Вы уверены?')) return;
-        const id = client.id;
-        deleteClientFromDataBase(id);
-        tableViewClientsList = tableViewClientsList.filter((client) => client.id !== id);
-        renderClientsTable(tableViewClientsList);
-        clientsModalInstance.hide();
-      });
-    }
+    clientFormOnSubmit();
   }
 
-  function addClientsFormSubmitEvent() {
+  async function deleteClient(id) {
+    if (!confirm('Вы уверены?')) return;
+      deleteClientFromDataBase(id);
+      clientsList = await getClientsFromDataBase();
+      tableViewClientsList = getViewClientsList(clientsList);
+      renderClientsTable(tableViewClientsList);
+  }
+
+  function clientFormOnSubmit() {
     const clientsForm = document.getElementById('clients-form');
     clientsForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -69,18 +48,50 @@ document.addEventListener('DOMContentLoaded', async () => {
       const clientsModal = document.getElementById('clients-modal-form');
       const clientsModalInstance = bootstrap.Modal.getInstance(clientsModal);
 
-      const id = document.getElementById('id').value;
+      const id = document.getElementById('id').value.trim();
       const lastName = document.getElementById('last-name').value.trim();
       const firstName = document.getElementById('first-name').value.trim();
       const secondName = document.getElementById('second-name').value.trim();
 
-      const client = await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: [], });
-      tableViewClientsList.push(clientMapper(client));
+      const client = !id ? await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: [], }) : await updateClientInDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: [], });
+      clientsList = await getClientsFromDataBase();
+      tableViewClientsList = getViewClientsList(clientsList);
 
       clientsModalInstance.hide();
-
       renderClientsTable(tableViewClientsList);
     });
+  }
+
+  async function addNewClientEvent() {
+    const addButton = document.getElementById('add-client-btn');
+    addButton.addEventListener('click', async () => {
+      await showModalWindow();
+    });
+  }
+
+  async function showModalWindow(id) {
+    const clientsModal = document.getElementById('clients-modal-form');
+    const clientsModalInstance = bootstrap.Modal.getInstance(clientsModal);
+    clientsModalInstance.show();
+
+    const title = document.getElementById('modal-title');
+    const idSpan = document.getElementById('client-id-span');
+    const cancelButton = document.getElementById('modal-cancel-btn');
+
+    title.textContent = !id ? 'Новый клиент' : 'Изменить данные';
+    idSpan.textContent = !id ? '' : `ID: ${id}`;
+    cancelButton.textContent = !id ? 'Отмена' : 'Удалить клиента';
+
+    fillFormWithClientData(id);
+  }
+
+  async function fillFormWithClientData(id) {
+    if (!id) return;
+    const client = await getClientByIdFromDataBase(id);
+    document.getElementById('id').value = client.id;
+    document.getElementById('last-name').value = client.surname;
+    document.getElementById('first-name').value = client.name;
+    document.getElementById('second-name').value = client.lastName;
   }
 
   function addTableSorting() {
@@ -133,12 +144,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     table.innerHTML = '';
 
     for (const client of viewClientsList) {
-      const clientElement = createClientElement(client);
+      const clientElement = await createClientElement(client);
       table.append(clientElement);
     }
   }
 
-  function createClientElement(client) {
+  async function createClientElement(client) {
     const tr = document.createElement('tr');
     tr.classList.add('table__row');
 
@@ -163,31 +174,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     deleteButton.textContent = 'Удалить';
 
     editButton.addEventListener('click', async () => {
-      showModalWindow();
-
-      const title = document.getElementById('modal-title');
-      const idSpan = document.getElementById('client-id-span');
-      const cancelButton = document.getElementById('modal-cancel-btn');
-      const deleteButton = document.getElementById('modal-delete-btn');
-
-      title.textContent = 'Изменить данные';
-      idSpan.textContent = `ID: ${client.id}`;
-      cancelButton.classList.add('hidden');
-      deleteButton.classList.remove('hidden');
-
-      const editedClient = await getClientByIdFromDataBase(client.id);
-
-      document.getElementById('id').value = editedClient.id;
-      document.getElementById('last-name').value = editedClient.surname;
-      document.getElementById('first-name').value = editedClient.name;
-      document.getElementById('second-name').value = editedClient.lastName;
+      await showModalWindow(client.id)
     });
-    deleteButton.addEventListener('click', () => {
-      if (!confirm('Вы уверены?')) return;
-      const id = client.id;
-      deleteClientFromDataBase(id);
-      tableViewClientsList = tableViewClientsList.filter((client) => client.id !== id);
-      renderClientsTable(tableViewClientsList);
+    deleteButton.addEventListener('click', async () => {
+      await deleteClient(client.id);
     });
 
     td.append(editButton);
@@ -238,6 +228,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     const newClient = await response.json();
     return newClient;
+  }
+
+  async function updateClientInDataBase(client) {
+    const response = await fetch(`${url}/api/clients/${client.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(client),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    const updatedClient = await response.json();
+    return updatedClient;
   }
 
   async function getClientsFromDataBase() {
