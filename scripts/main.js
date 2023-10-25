@@ -14,10 +14,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function addClientsFormSubmitEvent() {
-    const clientModal = document.getElementById('clients-modal-form');
     const clientsForm = document.getElementById('clients-form');
     clientsForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+
+      //https://stackoverflow.com/questions/66541564/how-to-hide-bootstrap-5-modal-only-on-success
+      const clientsModal = document.getElementById('clients-modal-form');
+      const clientsModalInstance = bootstrap.Modal.getInstance(clientsModal);
 
       const id = document.getElementById('id').value;
       const lastName = document.getElementById('last-name').value.trim();
@@ -28,7 +31,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       tableViewClientsList.push(clientMapper(client));
 
       clientsForm.reset();
-      clientModal.dispose();
+      clientsModalInstance.hide();
+
       renderClientsTable(tableViewClientsList);
     });
   }
@@ -62,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function addClientsFiltration() {
     const filter = document.getElementById('filter');
     filter.addEventListener('keyup', async (e) => {
-      clientsList = e.target.value ? await searchClientsInDataBase(e.target.value) : await getClientsFromDataBase();
+      clientsList = !!e.target.value ? await searchClientsInDataBase(e.target.value) : await getClientsFromDataBase();
       tableViewClientsList = getViewClientsList(clientsList);
       renderClientsTable(tableViewClientsList);
     });
@@ -116,7 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!confirm('Вы уверены?')) return;
       const id = client.id;
       deleteClientFromDataBase(id);
-      tableViewClientsList = tableViewClientsList.filter((student) => student.id !== id);
+      tableViewClientsList = tableViewClientsList.filter((client) => client.id !== id);
       renderClientsTable(tableViewClientsList);
     });
 
