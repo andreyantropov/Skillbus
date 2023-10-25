@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Skillbus - Клиенты</title>
+  <link rel="icon" type="image/x-icon" href="favicon.svg">
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,10 +37,10 @@
         <table class="clients__table table">
           <thead class="table__header">
             <tr class="table__row">
-              <th class="table__header-title" id="id-header" scope="col">ID</th>
-              <th class="table__header-title" id="name-header" scope="col">Фамилия Имя Отчество</th>
-              <th class="table__header-title" id="create-date-header" scope="col">Дата и время создания</th>
-              <th class="table__header-title" id="update-date-header" scope="col">Последние изменения</th>
+              <th class="table__header-title table__header-title_sortable" id="id-header" scope="col">ID</th>
+              <th class="table__header-title table__header-title_sortable" id="name-header" scope="col">Фамилия Имя Отчество</th>
+              <th class="table__header-title table__header-title_sortable" id="create-date-header" scope="col">Дата и время создания</th>
+              <th class="table__header-title table__header-title_sortable" id="update-date-header" scope="col">Последние изменения</th>
               <th class="table__header-title" id="contacts-header" scope="col">Контакты</th>
               <th class="table__header-title" id="actions-header" scope="col">Действия</th>
             </tr>
@@ -73,12 +74,12 @@
             <div class="form__group input form-floating mb-3">
               <input class="input__control form-control" type="text" name="last-name" id="last-name"
                 placeholder="Фамилия*" minlength="2" maxlength="30" required>
-              <label class="input__label" for="last-name">Фамилия*</label>
+              <label class="input__label" for="last-name">Фамилия</label>
             </div>
             <div class="form__group input form-floating mb-3">
               <input class="input__control form-control" type="text" name="first-name" id="first-name"
                 placeholder="Имя*" minlength="2" maxlength="30" required>
-              <label class="input__label" for="first-name">Имя*</label>
+              <label class="input__label" for="first-name">Имя</label>
             </div>
             <div class="form__group input form-floating mb-3">
               <input class="input__control form-control" type="text" name="second-name" id="second-name"

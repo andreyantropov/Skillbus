@@ -114,6 +114,10 @@ body {
   color: var(--text-grey);
 }
 
+.table__header-title_sortable {
+  cursor: pointer;
+}
+
 .sorted::after {
   content: "\2193";
   padding-left: 5px;
@@ -143,6 +147,11 @@ body {
   border: none;
   border-bottom: 1px solid var(--text-grey);
   border-radius: 0;
+}
+
+.input__control:required ~ .input__label::after {
+  content: "*";
+  color: var(--primary-color);
 }
 
 .modal__title {

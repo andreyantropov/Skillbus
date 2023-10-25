@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const clientsModal = document.getElementById('clients-modal-form');
       const clientsModalInstance = bootstrap.Modal.getInstance(clientsModal);
 
-      const id = document.getElementById('id').value.trim();
+      const id = document.getElementById('id').value;
       const lastName = document.getElementById('last-name').value.trim();
       const firstName = document.getElementById('first-name').value.trim();
       const secondName = document.getElementById('second-name').value.trim();
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function addTableSorting() {
-    const tableHeaders = document.getElementsByClassName('table__header-title');
+    const tableHeaders = document.getElementsByClassName('table__header-title_sortable');
     for (const tableHeaderTitle of tableHeaders) {
       tableHeaderTitle.addEventListener('click', () => {
         if (tableHeaderTitle.classList.contains('sorted')) {
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function resetSorting() {
-    const tableHeaders = document.getElementsByClassName('table__header-title');
+    const tableHeaders = document.getElementsByClassName('table__header-title_sortable');
     for (const tableHeader of tableHeaders) {
       tableHeader.classList.remove('sorted');
       tableHeader.classList.remove('sorted-reverse');
@@ -122,10 +122,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function addClientsFiltration() {
     const filter = document.getElementById('filter');
-    filter.addEventListener('keyup', async (e) => {
-      clientsList = !!e.target.value ? await searchClientsInDataBase(e.target.value) : await getClientsFromDataBase();
-      tableViewClientsList = getViewClientsList(clientsList);
-      renderClientsTable(tableViewClientsList);
+    let inputTimeout = 0;
+    filter.addEventListener('keyup', (e) => {
+      clearTimeout(inputTimeout);
+      inputTimeout = setTimeout(async () => {
+        clientsList = !!e.target.value ? await searchClientsInDataBase(e.target.value) : await getClientsFromDataBase();
+        tableViewClientsList = getViewClientsList(clientsList);
+        renderClientsTable(tableViewClientsList);
+      }, 300);
     });
   }
 
@@ -163,15 +167,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     const td = document.createElement('td');
     const editButton = document.createElement('button');
     const deleteButton = document.createElement('button');
+    const editIcon = document.createElement('img');
+    const deleteIcon = document.createElement('img');
 
     td.classList.add('table__cell');
     td.classList.add('table__cell_actions');
+    editIcon.src = 'img/edit.svg';
+    editIcon.ariaHidden = true;
+    deleteIcon.src = 'img/delete.svg';
+    deleteIcon.ariaHidden = true;
+    editButton.classList.add('table__btn');
+    editButton.classList.add('table__btn_edit');
     editButton.classList.add('btn');
-    editButton.classList.add('btn-success');
+    editButton.classList.add('btn-reset');
     editButton.textContent = 'Изменить';
+    editButton.prepend(editIcon);
+    deleteButton.classList.add('table__btn');
+    deleteButton.classList.add('table__btn_delete');
     deleteButton.classList.add('btn');
-    deleteButton.classList.add('btn-danger');
+    deleteButton.classList.add('btn-reset');
     deleteButton.textContent = 'Удалить';
+    deleteButton.prepend(deleteIcon);
 
     editButton.addEventListener('click', async () => {
       await showModalWindow(client.id)
@@ -189,7 +205,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function sortClientsTable(clientsList) {
     let sortedClientsList = [...clientsList];
-    const tableHeaders = document.getElementsByClassName('table__header-title');
+    const tableHeaders = document.getElementsByClassName('table__header-title_sortable');
     for (const tableHeader of tableHeaders) {
       if (tableHeader.classList.contains('sorted')) {
         sortedClientsList = sortArrayByProperty(clientsList, bindSortValues(tableHeader.id), false);
