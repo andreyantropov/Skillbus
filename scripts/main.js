@@ -47,6 +47,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const dropdownBtn = document.createElement('button');
     const dropdownMenu = document.createElement('ul');
     const contactControl = document.createElement('input');
+    const deleteBtn = document.createElement('button');
+    const deleteIcon = document.createElement('img');
 
     inputGroup.classList.add('input-group');
     inputGroup.classList.add('contact-input-group');
@@ -61,6 +63,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     dropdownMenu.classList.add('dropdown-menu');
     contactControl.classList.add('form-control');
     contactControl.ariaLabel = 'Контакт пользователя';
+    contactControl.placeholder = 'Введите данные контакта';
+    deleteBtn.classList.add('btn');
+    deleteBtn.classList.add('btn-outline-secondary');
+    deleteIcon.src = 'img/delete-contact.svg';
+    deleteIcon.ariaLabel = 'Удалить контакт';
 
     const contactsTypes = ['Телефон', 'Доп. телефон', 'Email', 'VK', 'Facebook'];
     for (const type of contactsTypes) {
@@ -79,9 +86,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       dropdownMenu.append(item);
     }
 
+    deleteBtn.addEventListener('click', () => {
+      inputGroup.remove();
+    });
+
+    deleteBtn.append(deleteIcon);
     inputGroup.append(dropdownBtn);
     inputGroup.append(dropdownMenu);
     inputGroup.append(contactControl);
+    inputGroup.append(deleteBtn);
 
     return inputGroup;
   }
@@ -231,9 +244,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     td.classList.add('table__cell');
     td.classList.add('table__cell_actions');
     editIcon.src = 'img/edit.svg';
-    editIcon.ariaHidden = true;
-    deleteIcon.src = 'img/delete.svg';
-    deleteIcon.ariaHidden = true;
+    editIcon.ariaLabel= 'Редактировать клиента';
+    deleteIcon.src = 'img/delete-client.svg';
+    deleteIcon.ariaHidden = 'Удалить клиента';
     editButton.classList.add('table__btn');
     editButton.classList.add('table__btn_edit');
     editButton.classList.add('btn');
