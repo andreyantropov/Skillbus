@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     deleteBtn.classList.add('btn');
     deleteBtn.classList.add('btn-outline-secondary');
     deleteIcon.src = 'img/delete-contact.svg';
-    deleteIcon.ariaLabel = 'Удалить контакт';
+    deleteIcon.ariaHidden = true;
 
     const contactsTypes = ['Телефон', 'Доп. телефон', 'Email', 'VK', 'Facebook'];
     for (const type of contactsTypes) {
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const firstName = document.getElementById('first-name').value.trim();
       const secondName = document.getElementById('second-name').value.trim();
       const contactsElements = Array.from(document.getElementsByClassName('contact-input-group'));
-      const contacts = contactsElements.map((contact) => ({ type: contact.firstChild.textContent, value: contact.lastChild.value.trim(), }));
+      const contacts = contactsElements.map((contact) => ({ type: contact.querySelector('.dropdown-toggle').textContent, value: contact.querySelector('.form-control').value.trim(), }));
 
       const client = !id ? await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, }) : await updateClientInDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, });
       clientsList = await getClientsFromDataBase();
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function clientMapper(client) {
-    return ({ id: client.id, name: `${client.surname} ${client.name} ${client.lastName}`, createDate: new Date(client.createdAt), updateDate: new Date(client.updatedAt), contacts: [], });
+    return ({ id: client.id, name: `${client.surname} ${client.name} ${client.lastName}`, createDate: new Date(client.createdAt), updateDate: new Date(client.updatedAt), contacts: client.contacts, });
   }
 
   async function renderClientsTable(clientsList) {
@@ -231,7 +231,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     for (const [key, value] of Object.entries(client)) {
       const td = document.createElement('td');
       td.classList.add('table__cell');
-      td.textContent = value;
+      if (key !== 'contacts') {
+        td.textContent = value;
+      } else {
+        for (const contact of value) {
+          td.classList.add('table__cell_contacts');
+          const icon = document.createElement('img');
+          icon.src = getContactIcon(contact.type);
+          icon.alt = 'Контакт клиента';
+          td.append(icon);
+        }
+      }
       tr.append(td);
     }
 
@@ -244,9 +254,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     td.classList.add('table__cell');
     td.classList.add('table__cell_actions');
     editIcon.src = 'img/edit.svg';
-    editIcon.ariaLabel= 'Редактировать клиента';
+    editIcon.ariaHidden = true;
     deleteIcon.src = 'img/delete-client.svg';
-    deleteIcon.ariaHidden = 'Удалить клиента';
+    deleteIcon.ariaHidden = true;
     editButton.classList.add('table__btn');
     editButton.classList.add('table__btn_edit');
     editButton.classList.add('btn');
@@ -272,6 +282,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     tr.append(td);
 
     return tr;
+  }
+
+  function getContactIcon(key) {
+    switch (key) {
+      case 'Телефон':
+        return 'img/phone.svg';
+      case 'Email':
+        return 'img/email.svg';
+      case 'VK':
+        return 'img/vk.svg';
+      case 'Facebook':
+        return 'img/facebook.svg';
+      default:
+        return 'img/contact.svg';
+    }
   }
 
   function sortClientsTable(clientsList) {
