@@ -49,18 +49,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const contactControl = document.createElement('input');
 
     inputGroup.classList.add('input-group');
+    inputGroup.classList.add('contact-input-group');
     inputGroup.classList.add('mb-3');
     dropdownBtn.classList.add('btn');
     dropdownBtn.classList.add('btn-outline-secondary');
     dropdownBtn.classList.add('dropdown-toggle');
+    dropdownBtn.type = 'button';
     dropdownBtn.ariaExpanded = 'false';
-    dropdownBtn.dataBsToggle = 'dropdown';
+    dropdownBtn.dataset.bsToggle = 'dropdown';
     dropdownBtn.textContent = 'Телефон';
+    dropdownMenu.classList.add('dropdown-menu');
     contactControl.classList.add('form-control');
-
-    dropdownBtn = function (dropdownToggleEl) {
-      return new bootstrap.Dropdown(dropdownToggleEl)
-    };
+    contactControl.ariaLabel = 'Контакт пользователя';
 
     const contactsTypes = ['Телефон', 'Доп. телефон', 'Email', 'VK', 'Facebook'];
     for (const type of contactsTypes) {
@@ -70,6 +70,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       link.classList.add('dropdown-item');
       link.href = '#';
       link.textContent = type;
+
+      link.addEventListener('click', () => {
+        dropdownBtn.textContent = link.textContent;
+      });
 
       item.append(link);
       dropdownMenu.append(item);
@@ -94,8 +98,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       const lastName = document.getElementById('last-name').value.trim();
       const firstName = document.getElementById('first-name').value.trim();
       const secondName = document.getElementById('second-name').value.trim();
+      const contactsElements = Array.from(document.getElementsByClassName('contact-input-group'));
+      const contacts = contactsElements.map((contact) => ({ type: contact.firstChild.textContent, value: contact.lastChild.value.trim(), }));
 
-      const client = !id ? await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: [], }) : await updateClientInDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: [], });
+      const client = !id ? await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, }) : await updateClientInDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, });
       clientsList = await getClientsFromDataBase();
       tableViewClientsList = getViewClientsList(clientsList);
 
