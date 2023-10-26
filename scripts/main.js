@@ -22,22 +22,64 @@ document.addEventListener('DOMContentLoaded', async () => {
       clientsForm.reset();
     });
 
+    addContactsOnClick();
+    clientFormOnSubmit();
+
     const cancelButton = document.getElementById('modal-cancel-btn');
     cancelButton.addEventListener('click', async () => {
       const id = document.getElementById('id').value;
       if (!!id) await deleteClient(id);
       clientsModalInstance.hide();
     });
-
-    clientFormOnSubmit();
   }
 
-  async function deleteClient(id) {
-    if (!confirm('Вы уверены?')) return;
-      await deleteClientFromDataBase(id);
-      clientsList = await getClientsFromDataBase();
-      tableViewClientsList = getViewClientsList(clientsList);
-      renderClientsTable(tableViewClientsList);
+  function addContactsOnClick() {
+    const addContactBtn = document.getElementById('add-contact-btn');
+    addContactBtn.addEventListener('click', () => {
+      addContactBtn.before( createContact() );
+    });
+  }
+
+  function createContact() {
+    //https://getbootstrap.com/docs/5.0/forms/input-group/
+    //https://getbootstrap.com/docs/5.0/components/dropdowns/
+    const inputGroup = document.createElement('div');
+    const dropdownBtn = document.createElement('button');
+    const dropdownMenu = document.createElement('ul');
+    const contactControl = document.createElement('input');
+
+    inputGroup.classList.add('input-group');
+    inputGroup.classList.add('mb-3');
+    dropdownBtn.classList.add('btn');
+    dropdownBtn.classList.add('btn-outline-secondary');
+    dropdownBtn.classList.add('dropdown-toggle');
+    dropdownBtn.ariaExpanded = 'false';
+    dropdownBtn.dataBsToggle = 'dropdown';
+    dropdownBtn.textContent = 'Телефон';
+    contactControl.classList.add('form-control');
+
+    dropdownBtn = function (dropdownToggleEl) {
+      return new bootstrap.Dropdown(dropdownToggleEl)
+    };
+
+    const contactsTypes = ['Телефон', 'Доп. телефон', 'Email', 'VK', 'Facebook'];
+    for (const type of contactsTypes) {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+
+      link.classList.add('dropdown-item');
+      link.href = '#';
+      link.textContent = type;
+
+      item.append(link);
+      dropdownMenu.append(item);
+    }
+
+    inputGroup.append(dropdownBtn);
+    inputGroup.append(dropdownMenu);
+    inputGroup.append(contactControl);
+
+    return inputGroup;
   }
 
   function clientFormOnSubmit() {
@@ -60,6 +102,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       clientsModalInstance.hide();
       renderClientsTable(tableViewClientsList);
     });
+  }
+
+  async function deleteClient(id) {
+    if (!confirm('Вы уверены?')) return;
+      await deleteClientFromDataBase(id);
+      clientsList = await getClientsFromDataBase();
+      tableViewClientsList = getViewClientsList(clientsList);
+      renderClientsTable(tableViewClientsList);
   }
 
   async function addNewClientEvent() {
