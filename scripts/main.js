@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function deleteClient(id) {
     if (!confirm('Вы уверены?')) return;
-      deleteClientFromDataBase(id);
+      await deleteClientFromDataBase(id);
       clientsList = await getClientsFromDataBase();
       tableViewClientsList = getViewClientsList(clientsList);
       renderClientsTable(tableViewClientsList);
@@ -86,6 +86,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function fillFormWithClientData(id) {
+    document.getElementById('id').value = '';
+
     if (!id) return;
     const client = await getClientByIdFromDataBase(id);
     document.getElementById('id').value = client.id;
@@ -276,8 +278,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     return filteredClientsList;
   }
 
-  function deleteClientFromDataBase(id) {
-    fetch(`${url}/api/clients/${id}`, {
+  async function deleteClientFromDataBase(id) {
+    await fetch(`${url}/api/clients/${id}`, {
       method: 'DELETE',
     });
   }
