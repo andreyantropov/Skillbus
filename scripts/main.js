@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     clientsModal.addEventListener('hidden.bs.modal', () => {
       const clientsForm = document.getElementById('clients-form');
       clientsForm.reset();
+
+      const contactsContainer = document.getElementById('contacts-container');
+      contactsContainer.innerHTML = '';
     });
 
     addContactsOnClick();
@@ -35,12 +38,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function addContactsOnClick() {
     const addContactBtn = document.getElementById('add-contact-btn');
+    const contactsContainer = document.getElementById('contacts-container');
     addContactBtn.addEventListener('click', () => {
-      addContactBtn.before( createContact() );
+      contactsContainer.append( createContact() );
     });
   }
 
-  function createContact() {
+  function createContact(contact = { type: 'Телефон', value: '', }) {
     //https://getbootstrap.com/docs/5.0/forms/input-group/
     //https://getbootstrap.com/docs/5.0/components/dropdowns/
     const inputGroup = document.createElement('div');
@@ -50,8 +54,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const deleteBtn = document.createElement('button');
     const deleteIcon = document.createElement('img');
 
-    inputGroup.classList.add('input-group');
     inputGroup.classList.add('contact-input-group');
+    inputGroup.classList.add('input-group');
     inputGroup.classList.add('mb-3');
     dropdownBtn.classList.add('btn');
     dropdownBtn.classList.add('btn-outline-secondary');
@@ -59,11 +63,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     dropdownBtn.type = 'button';
     dropdownBtn.ariaExpanded = 'false';
     dropdownBtn.dataset.bsToggle = 'dropdown';
-    dropdownBtn.textContent = 'Телефон';
+    dropdownBtn.textContent = contact.type;
     dropdownMenu.classList.add('dropdown-menu');
     contactControl.classList.add('form-control');
     contactControl.ariaLabel = 'Контакт пользователя';
     contactControl.placeholder = 'Введите данные контакта';
+    contactControl.value = contact.value;
     deleteBtn.classList.add('btn');
     deleteBtn.classList.add('btn-outline-secondary');
     deleteIcon.src = 'img/delete-contact.svg';
@@ -163,6 +168,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('last-name').value = client.surname;
     document.getElementById('first-name').value = client.name;
     document.getElementById('second-name').value = client.lastName;
+
+    const addContactBtn = document.getElementById('add-contact-btn');
+    contactsContainer = document.getElementById('contacts-container');
+    for (const contact of client.contacts) {
+      contactsContainer.append( createContact(contact) );
+    }
   }
 
   function addTableSorting() {
