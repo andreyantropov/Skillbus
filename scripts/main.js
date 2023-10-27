@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   await prepareEvironment();
   renderClientsTable(tableViewClientsList);
 
+  if (window.location.hash) {
+    await showModalWindow(window.location.hash.substring(1));
+  }
+
   async function prepareEvironment() {
     createModalWindow();
     addNewClientEvent();
@@ -18,6 +22,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const clientsModal = document.getElementById('clients-modal-form');
     const clientsModalInstance = new bootstrap.Modal(clientsModal, {});
     clientsModal.addEventListener('hidden.bs.modal', () => {
+      removeHash();
+
       const clientsForm = document.getElementById('clients-form');
       clientsForm.reset();
 
@@ -54,9 +60,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const deleteBtn = document.createElement('button');
     const deleteIcon = document.createElement('img');
 
-    inputGroup.classList.add('contact-input-group');
+    inputGroup.classList.add('contact__input-group');
+    inputGroup.classList.add('contact');
     inputGroup.classList.add('input-group');
     inputGroup.classList.add('mb-3');
+    dropdownBtn.classList.add('contact__btn-dropdown');
     dropdownBtn.classList.add('btn');
     dropdownBtn.classList.add('btn-outline-secondary');
     dropdownBtn.classList.add('dropdown-toggle');
@@ -64,11 +72,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     dropdownBtn.ariaExpanded = 'false';
     dropdownBtn.dataset.bsToggle = 'dropdown';
     dropdownBtn.textContent = contact.type;
+    dropdownMenu.classList.add('contact__dropdown');
     dropdownMenu.classList.add('dropdown-menu');
     contactControl.classList.add('form-control');
     contactControl.ariaLabel = 'Контакт пользователя';
     contactControl.placeholder = 'Введите данные контакта';
     contactControl.value = contact.value;
+    deleteBtn.classList.add('contact__btn-delete');
     deleteBtn.classList.add('btn');
     deleteBtn.classList.add('btn-outline-secondary');
     deleteIcon.src = 'img/delete-contact.svg';
@@ -116,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const lastName = document.getElementById('last-name').value.trim();
       const firstName = document.getElementById('first-name').value.trim();
       const secondName = document.getElementById('second-name').value.trim();
-      const contactsElements = Array.from(document.getElementsByClassName('contact-input-group'));
+      const contactsElements = Array.from(document.getElementsByClassName('contact__input-group'));
       const contacts = contactsElements.map((contact) => ({ type: contact.querySelector('.dropdown-toggle').textContent, value: contact.querySelector('.form-control').value.trim(), }));
 
       const client = !id ? await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, }) : await updateClientInDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, });
@@ -144,6 +154,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function showModalWindow(id) {
+    setHash(id);
+
     const clientsModal = document.getElementById('clients-modal-form');
     const clientsModalInstance = bootstrap.Modal.getInstance(clientsModal);
     clientsModalInstance.show();
@@ -156,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     idSpan.textContent = !id ? '' : `ID: ${id}`;
     cancelButton.textContent = !id ? 'Отмена' : 'Удалить клиента';
 
-    fillFormWithClientData(id);
+    await fillFormWithClientData(id);
   }
 
   async function fillFormWithClientData(id) {
@@ -169,7 +181,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('first-name').value = client.name;
     document.getElementById('second-name').value = client.lastName;
 
-    const addContactBtn = document.getElementById('add-contact-btn');
     contactsContainer = document.getElementById('contacts-container');
     for (const contact of client.contacts) {
       contactsContainer.append( createContact(contact) );
@@ -387,5 +398,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     await fetch(`${url}/api/clients/${id}`, {
       method: 'DELETE',
     });
+  }
+
+  function setHash(hash) {
+    window.location.hash = hash;
+  }
+
+  function removeHash() {
+    history.pushState("", document.title, window.location.pathname + window.location.search);
   }
 });
