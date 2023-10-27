@@ -3,6 +3,7 @@ const url = 'http://localhost:3000';
 document.addEventListener('DOMContentLoaded', async () => {
   let clientsList = await getClientsFromDataBase();
   let tableViewClientsList = getViewClientsList(clientsList);
+  let autoCompleteList = tableViewClientsList.map(client => client.name);
 
   await prepareEvironment();
   renderClientsTable(tableViewClientsList);
@@ -12,10 +13,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function prepareEvironment() {
+    autocomplete(document.getElementById('filter'), autoCompleteList);
     createModalWindow();
-    addNewClientEvent();
-    addClientsFiltration();
-    addTableSorting();
+    addNewClientBtnOnClick();
+    addClientsTableFiltration();
+    addClientsTableSorting();
   }
 
   function createModalWindow() {
@@ -31,8 +33,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       contactsContainer.innerHTML = '';
     });
 
-    addContactsOnClick();
-    clientFormOnSubmit();
+    addContactsBtnOnClick();
+    clientsFormOnSubmit();
 
     const cancelButton = document.getElementById('modal-cancel-btn');
     cancelButton.addEventListener('click', async () => {
@@ -42,7 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  function addContactsOnClick() {
+  function addContactsBtnOnClick() {
     const addContactBtn = document.getElementById('add-contact-btn');
     const contactsContainer = document.getElementById('contacts-container');
     addContactBtn.addEventListener('click', () => {
@@ -51,8 +53,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function createContact(contact = { type: 'Телефон', value: '', }) {
-    //https://getbootstrap.com/docs/5.0/forms/input-group/
-    //https://getbootstrap.com/docs/5.0/components/dropdowns/
     const inputGroup = document.createElement('div');
     const dropdownBtn = document.createElement('button');
     const dropdownMenu = document.createElement('ul');
@@ -60,29 +60,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const deleteBtn = document.createElement('button');
     const deleteIcon = document.createElement('img');
 
-    inputGroup.classList.add('contact__input-group');
-    inputGroup.classList.add('contact');
-    inputGroup.classList.add('input-group');
-    inputGroup.classList.add('mb-3');
-    dropdownBtn.classList.add('contact__btn-dropdown');
-    dropdownBtn.classList.add('btn');
-    dropdownBtn.classList.add('btn-outline-secondary');
-    dropdownBtn.classList.add('dropdown-toggle');
+    inputGroup.classList.add('contact__input-group', 'contact', 'input-group', 'mb-3');
+    dropdownBtn.classList.add('contact__btn-dropdown', 'btn', 'btn-outline-secondary', 'dropdown-toggle');
     dropdownBtn.type = 'button';
     dropdownBtn.ariaExpanded = 'false';
     dropdownBtn.dataset.bsToggle = 'dropdown';
     dropdownBtn.textContent = contact.type;
-    dropdownMenu.classList.add('contact__dropdown');
-    dropdownMenu.classList.add('dropdown-menu');
-    contactControl.classList.add('form-control');
+    dropdownMenu.classList.add('contact__dropdown', 'dropdown-menu', 'form-control');
     contactControl.ariaLabel = 'Контакт пользователя';
     contactControl.placeholder = 'Введите данные контакта';
     contactControl.value = contact.value;
     contactControl.required = true;
-    contactControl.type = getContactType(contact.type);
-    deleteBtn.classList.add('contact__btn-delete');
-    deleteBtn.classList.add('btn');
-    deleteBtn.classList.add('btn-outline-secondary');
+    contactControl.type = getContactControlType(contact.type);
+    deleteBtn.classList.add('contact__btn-delete', 'btn', 'btn-outline-secondary');
     deleteIcon.src = 'img/delete-contact.svg';
     deleteIcon.ariaHidden = true;
 
@@ -97,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       link.addEventListener('click', () => {
         dropdownBtn.textContent = link.textContent;
-        contactControl.type = getContactType(link.textContent);
+        contactControl.type = getContactControlType(link.textContent);
       });
 
       item.append(link);
@@ -117,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return inputGroup;
   }
 
-  function getContactType(type) {
+  function getContactControlType(type) {
     switch (type) {
       case 'Телефон':
         return 'tel';
@@ -128,7 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  function clientFormOnSubmit() {
+  function clientsFormOnSubmit() {
     const clientsForm = document.getElementById('clients-form');
     clientsForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -146,6 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const client = !id ? await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, }) : await updateClientInDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, });
       clientsList = await getClientsFromDataBase();
       tableViewClientsList = getViewClientsList(clientsList);
+      autoCompleteList = tableViewClientsList.map(client => client.name);
 
       clientsModalInstance.hide();
       renderClientsTable(tableViewClientsList);
@@ -157,10 +148,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       await deleteClientFromDataBase(id);
       clientsList = await getClientsFromDataBase();
       tableViewClientsList = getViewClientsList(clientsList);
+      autoCompleteList = tableViewClientsList.map(client => client.name);
       renderClientsTable(tableViewClientsList);
   }
 
-  async function addNewClientEvent() {
+  async function addNewClientBtnOnClick() {
     const addButton = document.getElementById('add-client-btn');
     addButton.addEventListener('click', async () => {
       await showModalWindow();
@@ -201,7 +193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  function addTableSorting() {
+  function addClientsTableSorting() {
     const tableHeaders = document.getElementsByClassName('table__header-title_sortable');
     for (const tableHeaderTitle of tableHeaders) {
       tableHeaderTitle.addEventListener('click', () => {
@@ -222,22 +214,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   function resetSorting() {
     const tableHeaders = document.getElementsByClassName('table__header-title_sortable');
     for (const tableHeader of tableHeaders) {
-      tableHeader.classList.remove('sorted');
-      tableHeader.classList.remove('sorted-reverse');
+      tableHeader.classList.remove('sorted', 'sorted-reverse');
     }
   }
 
-  function addClientsFiltration() {
+  function addClientsTableFiltration() {
     const filter = document.getElementById('filter');
     let inputTimeout = 0;
     filter.addEventListener('keyup', (e) => {
       clearTimeout(inputTimeout);
       inputTimeout = setTimeout(async () => {
-        clientsList = !!e.target.value ? await searchClientsInDataBase(e.target.value) : await getClientsFromDataBase();
-        tableViewClientsList = getViewClientsList(clientsList);
-        renderClientsTable(tableViewClientsList);
+        await clientsFilterOnChange(e.target.value);
       }, 300);
     });
+    filter.addEventListener('change', (e) => {
+      clearTimeout(inputTimeout);
+      inputTimeout = setTimeout(async () => {
+        await clientsFilterOnChange(e.target.value);
+      }, 300);
+    });
+  }
+
+  async function clientsFilterOnChange(value) {
+    clientsList = !!value ? await searchClientsInDataBase(value) : await getClientsFromDataBase();
+    tableViewClientsList = getViewClientsList(clientsList);
+    autoCompleteList = tableViewClientsList.map(client => client.name);
+    renderClientsTable(tableViewClientsList);
   }
 
   function getViewClientsList(clientsList) {
@@ -287,22 +289,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const editIcon = document.createElement('img');
     const deleteIcon = document.createElement('img');
 
-    td.classList.add('table__cell');
-    td.classList.add('table__cell_actions');
+    td.classList.add('table__cell', 'table__cell_actions');
     editIcon.src = 'img/edit.svg';
     editIcon.ariaHidden = true;
     deleteIcon.src = 'img/delete-client.svg';
     deleteIcon.ariaHidden = true;
-    editButton.classList.add('table__btn');
-    editButton.classList.add('table__btn_edit');
-    editButton.classList.add('btn');
-    editButton.classList.add('btn-reset');
+    editButton.classList.add('table__btn', 'table__btn_edit', 'btn');
     editButton.textContent = 'Изменить';
     editButton.prepend(editIcon);
-    deleteButton.classList.add('table__btn');
-    deleteButton.classList.add('table__btn_delete');
-    deleteButton.classList.add('btn');
-    deleteButton.classList.add('btn-reset');
+    deleteButton.classList.add('table__btn', 'table__btn_delete', 'btn');
     deleteButton.textContent = 'Удалить';
     deleteButton.prepend(deleteIcon);
 
