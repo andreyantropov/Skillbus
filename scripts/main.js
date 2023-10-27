@@ -78,6 +78,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     contactControl.ariaLabel = 'Контакт пользователя';
     contactControl.placeholder = 'Введите данные контакта';
     contactControl.value = contact.value;
+    contactControl.required = true;
+    contactControl.type = getContactType(contact.type);
     deleteBtn.classList.add('contact__btn-delete');
     deleteBtn.classList.add('btn');
     deleteBtn.classList.add('btn-outline-secondary');
@@ -95,6 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       link.addEventListener('click', () => {
         dropdownBtn.textContent = link.textContent;
+        contactControl.type = getContactType(link.textContent);
       });
 
       item.append(link);
@@ -112,6 +115,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     inputGroup.append(deleteBtn);
 
     return inputGroup;
+  }
+
+  function getContactType(type) {
+    switch (type) {
+      case 'Телефон':
+        return 'tel';
+      case 'Email':
+        return 'email';
+      default:
+        return 'text';
+    }
   }
 
   function clientFormOnSubmit() {
@@ -306,8 +320,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     return tr;
   }
 
-  function getContactIcon(key) {
-    switch (key) {
+  function getContactIcon(type) {
+    switch (type) {
       case 'Телефон':
         return 'img/phone.svg';
       case 'Email':
