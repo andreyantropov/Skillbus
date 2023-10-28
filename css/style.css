@@ -67,6 +67,10 @@ body {
   width: 100%;
 }
 
+.spinner-border {
+  color: var(--primary-color);
+}
+
 .header {
   background-color: #fff;
   box-shadow: 0px 3.38629px 5.64383px 0px rgba(176, 190, 197, 0.32), 0px 9.03012px 27.09036px 0px rgba(176, 190, 197, 0.32);
@@ -136,6 +140,15 @@ body {
   content: "\2191";
   padding-left: 5px;
   color: var(--primary-color);
+}
+
+.spinner-container {
+  padding: 100px 0;
+}
+
+.table__cell_loading .spinner-border {
+  width: 4rem;
+  height: 4rem;
 }
 
 .clients__button-container {
