@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderClientsTable(tableViewClientsList);
 
   if (window.location.hash) {
-    await showModalWindow(window.location.hash.substring(1));
+    const client = await getClientByIdFromDataBase(window.location.hash.substring(1));
+    await showModalWindow(client);
   }
 
   async function prepareEvironment() {
@@ -159,8 +160,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  async function showModalWindow(id) {
-    setHash(id);
+  async function showModalWindow(client) {
+    setHash(client.id);
 
     const clientsModal = document.getElementById('clients-modal-form');
     const clientsModalInstance = bootstrap.Modal.getInstance(clientsModal);
@@ -170,18 +171,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const idSpan = document.getElementById('client-id-span');
     const cancelButton = document.getElementById('modal-cancel-btn');
 
-    title.textContent = !id ? 'Новый клиент' : 'Изменить данные';
-    idSpan.textContent = !id ? '' : `ID: ${id}`;
-    cancelButton.textContent = !id ? 'Отмена' : 'Удалить клиента';
+    title.textContent = !client ? 'Новый клиент' : 'Изменить данные';
+    idSpan.textContent = !client ? '' : `ID: ${client.id}`;
+    cancelButton.textContent = !client ? 'Отмена' : 'Удалить клиента';
 
-    await fillFormWithClientData(id);
+    await fillFormWithClientData(client);
   }
 
-  async function fillFormWithClientData(id) {
+  async function fillFormWithClientData(client) {
     document.getElementById('id').value = '';
 
-    if (!id) return;
-    const client = await getClientByIdFromDataBase(id);
+    if (!client) return;
     document.getElementById('id').value = client.id;
     document.getElementById('last-name').value = client.surname;
     document.getElementById('first-name').value = client.name;
@@ -276,6 +276,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           td.classList.add('table__cell_contacts');
           const icon = document.createElement('img');
           icon.src = getContactIcon(contact.type);
+          icon.dataset.bsToggle = 'tooltip';
+          icon.title = contact.value;
           icon.alt = 'Контакт клиента';
           td.append(icon);
         }
@@ -302,7 +304,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     deleteButton.prepend(deleteIcon);
 
     editButton.addEventListener('click', async () => {
-      await showModalWindow(client.id)
+      const rowClient = await getClientByIdFromDataBase(client.id);
+      await showModalWindow(rowClient)
     });
     deleteButton.addEventListener('click', async () => {
       await deleteClient(client.id);
