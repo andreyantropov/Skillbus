@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const contactsContainer = document.getElementById('contacts-container');
     addContactBtn.addEventListener('click', () => {
       contactsContainer.append( createContact() );
+      addContactBtn.disabled = checkContactsCount();
     });
   }
 
@@ -118,6 +119,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     deleteBtn.addEventListener('click', () => {
       inputGroup.remove();
+      const addContactBtn = document.getElementById('add-contact-btn');
+      addContactBtn.disabled = checkContactsCount();
     });
 
     deleteBtn.append(deleteIcon);
@@ -165,6 +168,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       default:
         return 'text';
     }
+  }
+
+  function checkContactsCount() {
+    return document.getElementsByClassName('contact__input-group').length >= 10;
   }
 
   function clientsFormOnSubmit() {
