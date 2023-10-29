@@ -1,17 +1,33 @@
 const url = 'http://localhost:3000';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  showTableSpinner();
-  let clientsList = await getClientsFromDataBase();
-  let tableViewClientsList = getViewClientsList(clientsList);
-  let autoCompleteList = tableViewClientsList.map(client => client.name);
+  let clientsList;
+  let tableViewClientsList;
+  let autoCompleteList;
 
+  showHashUser();
   await prepareEvironment();
-  renderClientsTable(tableViewClientsList);
+  await updateTableView();
 
-  if (window.location.hash) {
-    const client = await getClientByIdFromDataBase(window.location.hash.substring(1));
-    await showModalWindow(client);
+
+  async function showHashUser() {
+    if (window.location.hash) {
+      const client = await getClientByIdFromDataBase(window.location.hash.substring(1));
+      await showModalWindow(client);
+    }
+  }
+
+  async function updateTableView(filter) {
+    showTableSpinner();
+    await createDataSet(filter);
+    autocomplete(document.getElementById('filter'), autoCompleteList);
+    renderClientsTable(tableViewClientsList);
+  }
+
+  async function createDataSet(filter) {
+    clientsList = !!filter ? await searchClientsInDataBase(filter) : await getClientsFromDataBase();
+    tableViewClientsList = getViewClientsList(clientsList);
+    autoCompleteList = tableViewClientsList.map(client => client.name);
   }
 
   function showTableSpinner() {
@@ -38,7 +54,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function prepareEvironment() {
-    autocomplete(document.getElementById('filter'), autoCompleteList);
     createModalWindow();
     addNewClientBtnOnClick();
     addClientsTableFiltration();
@@ -80,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function createContact(contact = { type: 'Телефон', value: '', }) {
     const inputGroup = document.createElement('div');
     const dropdownBtn = document.createElement('button');
-    const dropdownMenu = document.createElement('ul');
+    const dropdownMenu = createContactDropdownMenu(contactTypeOnClick);
     const contactControl = document.createElement('input');
     const deleteBtn = document.createElement('button');
     const deleteIcon = document.createElement('img');
@@ -91,7 +106,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     dropdownBtn.ariaExpanded = 'false';
     dropdownBtn.dataset.bsToggle = 'dropdown';
     dropdownBtn.textContent = contact.type;
-    dropdownMenu.classList.add('contact__dropdown', 'dropdown-menu');
     contactControl.classList.add('contact__control', 'form-control');
     contactControl.ariaLabel = 'Контакт пользователя';
     contactControl.placeholder = 'Введите данные контакта';
@@ -101,24 +115,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     deleteBtn.classList.add('contact__btn-delete', 'btn', 'btn-outline-secondary');
     deleteIcon.src = 'img/delete-contact.svg';
     deleteIcon.ariaHidden = true;
-
-    const contactsTypes = ['Телефон', 'Доп. телефон', 'Email', 'VK', 'Facebook'];
-    for (const type of contactsTypes) {
-      const item = document.createElement('li');
-      const link = document.createElement('a');
-
-      link.classList.add('dropdown-item');
-      link.href = '#';
-      link.textContent = type;
-
-      link.addEventListener('click', () => {
-        dropdownBtn.textContent = link.textContent;
-        contactControl.type = getContactControlType(link.textContent);
-      });
-
-      item.append(link);
-      dropdownMenu.append(item);
-    }
 
     deleteBtn.addEventListener('click', () => {
       inputGroup.remove();
@@ -130,7 +126,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     inputGroup.append(contactControl);
     inputGroup.append(deleteBtn);
 
+    function contactTypeOnClick(e) {
+      dropdownBtn.textContent = e.target.textContent;
+      contactControl.type = getContactControlType(e.target.textContent);
+    }
+
     return inputGroup;
+  }
+
+  function createContactDropdownMenu(contactTypeOnClick) {
+    const dropdownMenu = document.createElement('ul');
+    dropdownMenu.classList.add('contact__dropdown', 'dropdown-menu');
+
+    const contactsTypes = ['Телефон', 'Доп. телефон', 'Email', 'VK', 'Facebook'];
+    for (const type of contactsTypes) {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+
+      link.classList.add('dropdown-item');
+      link.href = '#';
+      link.textContent = type;
+
+      link.addEventListener('click', contactTypeOnClick);
+
+      item.append(link);
+      dropdownMenu.append(item);
+    }
+
+    return dropdownMenu;
   }
 
   function getContactControlType(type) {
@@ -148,11 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const clientsForm = document.getElementById('clients-form');
     clientsForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      const submitBtn = document.getElementById('clients-submit-btn');
-      submitBtn.disabled = true;
-      const submitSpinner = document.getElementById('clients-submit-spinner');
-      submitSpinner.classList.remove('hidden');
+      showClientSubmitSpinner(true);
 
       const clientsModal = document.getElementById('clients-modal-form');
       const clientsModalInstance = bootstrap.Modal.getInstance(clientsModal);
@@ -165,24 +184,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       const contacts = contactsElements.map((contact) => ({ type: contact.querySelector('.dropdown-toggle').textContent, value: contact.querySelector('.form-control').value.trim(), }));
 
       const client = !id ? await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, }) : await updateClientInDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, });
-      showTableSpinner();
-      clientsList = await getClientsFromDataBase();
-      tableViewClientsList = getViewClientsList(clientsList);
-      autoCompleteList = tableViewClientsList.map(client => client.name);
+      await updateTableView();
 
+      showClientSubmitSpinner(false);
       clientsModalInstance.hide();
-      renderClientsTable(tableViewClientsList);
     });
+  }
+
+  function showClientSubmitSpinner(isLoading) {
+    const submitBtn = document.getElementById('clients-submit-btn');
+    submitBtn.disabled = isLoading;
+    const submitSpinner = document.getElementById('clients-submit-spinner');
+    submitSpinner.classList.toggle('hidden');
   }
 
   async function deleteClient(id) {
     if (!confirm('Вы уверены?')) return;
       await deleteClientFromDataBase(id);
-      showTableSpinner();
-      clientsList = await getClientsFromDataBase();
-      tableViewClientsList = getViewClientsList(clientsList);
-      autoCompleteList = tableViewClientsList.map(client => client.name);
-      renderClientsTable(tableViewClientsList);
+      await updateTableView();
   }
 
   async function addNewClientBtnOnClick() {
@@ -193,32 +212,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function showModalWindow(client) {
-    if (!!client)
-      setHash(client.id);
+    !!client ? await showModalInEditMode(client) : showModalInInsertMode();
 
     const clientsModal = document.getElementById('clients-modal-form');
     const clientsModalInstance = bootstrap.Modal.getInstance(clientsModal);
     clientsModalInstance.show();
+  }
 
-    const title = document.getElementById('modal-title');
-    const idSpan = document.getElementById('client-id-span');
-    const submitBtn = document.getElementById('clients-submit-btn');
-    const submitSpinner = document.getElementById('clients-submit-spinner');
-    const cancelButton = document.getElementById('modal-cancel-btn');
+  function showModalInInsertMode() {
+    document.getElementById('modal-title').textContent = 'Новый клиент';
+    document.getElementById('client-id-span').textContent = '';
+    document.getElementById('id').value = '';
+    document.getElementById('modal-cancel-btn').textContent = 'Отмена';
+  }
 
-    title.textContent = !client ? 'Новый клиент' : 'Изменить данные';
-    idSpan.textContent = !client ? '' : `ID: ${client.id}`;
-    submitBtn.disabled = false;
-    submitSpinner.classList.add('hidden');
-    cancelButton.textContent = !client ? 'Отмена' : 'Удалить клиента';
+  async function showModalInEditMode(client) {
+    setHash(client.id);
+
+    document.getElementById('modal-title').textContent = 'Изменить данные';
+    document.getElementById('client-id-span').textContent = `ID: ${client.id}`;
+    document.getElementById('modal-cancel-btn').textContent = 'Удалить клиента';
 
     await fillFormWithClientData(client);
   }
 
   async function fillFormWithClientData(client) {
-    document.getElementById('id').value = '';
-
-    if (!client) return;
     document.getElementById('id').value = client.id;
     document.getElementById('last-name').value = client.surname;
     document.getElementById('first-name').value = client.name;
@@ -258,26 +276,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   function addClientsTableFiltration() {
     const filter = document.getElementById('filter');
     let inputTimeout = 0;
-    filter.addEventListener('keyup', (e) => {
-      clearTimeout(inputTimeout);
-      inputTimeout = setTimeout(async () => {
-        await clientsFilterOnChange(e.target.value);
-      }, 300);
-    });
-    filter.addEventListener('change', (e) => {
-      clearTimeout(inputTimeout);
-      inputTimeout = setTimeout(async () => {
-        await clientsFilterOnChange(e.target.value);
-      }, 300);
+    ['keyup', 'change'].forEach(event => {
+      filter.addEventListener(event, (e) => {
+        clearTimeout(inputTimeout);
+        inputTimeout = setTimeout(async () => {
+          await clientsFilterOnChange(e.target.value);
+        }, 300);
+      });
     });
   }
 
   async function clientsFilterOnChange(value) {
-    showTableSpinner();
-    clientsList = !!value ? await searchClientsInDataBase(value) : await getClientsFromDataBase();
-    tableViewClientsList = getViewClientsList(clientsList);
-    autoCompleteList = tableViewClientsList.map(client => client.name);
-    renderClientsTable(tableViewClientsList);
+    await updateTableView(value);
   }
 
   function getViewClientsList(clientsList) {
@@ -305,22 +315,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tr.classList.add('table__row');
 
     for (const [key, value] of Object.entries(client)) {
-      const td = document.createElement('td');
-      td.classList.add('table__cell');
-      if (key !== 'contacts') {
-        td.textContent = value;
-      } else {
-        for (const contact of value) {
-          td.classList.add('table__cell_contacts');
-          const icon = document.createElement('img');
-          icon.src = getContactIcon(contact.type);
-          icon.dataset.bsToggle = 'tooltip';
-          icon.title = contact.value;
-          icon.alt = 'Контакт клиента';
-          td.append(icon);
-        }
-      }
-      tr.append(td);
+      key !== 'contacts' ? tr.append( fillCell(value) ) : tr.append( fillContactsCell(value) );
     }
 
     const td = document.createElement('td');
@@ -346,15 +341,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     deleteButton.textContent = 'Удалить';
     deleteButton.prepend(deleteIcon);
 
+    function showEditBtnSpinner(isLoading) {
+      editButton.disabled = isLoading;
+      editIcon.classList.toggle('hidden');
+      editSpinner.classList.toggle('hidden');
+    }
+
     editButton.addEventListener('click', async () => {
-      editButton.disabled = true;
-      editIcon.classList.add('hidden');
-      editSpinner.classList.remove('hidden');
+      showEditBtnSpinner(true);
       const rowClient = await getClientByIdFromDataBase(client.id);
-      editButton.disabled = false;
-      editIcon.classList.remove('hidden');
-      editSpinner.classList.add('hidden');
-      await showModalWindow(rowClient)
+      await showModalWindow(rowClient);
+      showEditBtnSpinner(false);
     });
     deleteButton.addEventListener('click', async () => {
       await deleteClient(client.id);
@@ -365,6 +362,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     tr.append(td);
 
     return tr;
+  }
+
+  function fillCell(value) {
+    const td = document.createElement('td');
+    td.classList.add('table__cell');
+    td.textContent = value;
+    return td;
+  }
+
+  function fillContactsCell(contacts) {
+    const td = document.createElement('td');
+    td.classList.add('table__cell');
+    for (const contact of contacts) {
+      td.classList.add('table__cell_contacts');
+      const icon = document.createElement('img');
+      icon.src = getContactIcon(contact.type);
+      icon.dataset.bsToggle = 'tooltip';
+      icon.title = contact.value;
+      icon.alt = 'Контакт клиента';
+      td.append(icon);
+    }
+    return td;
   }
 
   function getContactIcon(type) {
