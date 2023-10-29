@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const contacts = contactsElements.map((contact) => ({ type: contact.querySelector('.dropdown-toggle').textContent, value: contact.querySelector('.form-control').value.trim(), }));
 
       try {
-        const client = !id ? await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, }) : await updateClientInDataBase({ _id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, });
+        const client = !id ? await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, }) : await updateClientInDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, });
         await updateTableView();
         clientsModalInstance.hide();
       } catch (e) {
@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tr.classList.add('table__row');
 
     for (const [key, value] of Object.entries(client)) {
-      key !== 'contacts' ? tr.append( fillCell(value) ) : tr.append( fillContactsCell(value) );
+      tr.append( preprocessingTableData( { key, value } ) );
     }
 
     const td = document.createElement('td');
@@ -370,6 +370,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     return tr;
   }
 
+  function preprocessingTableData(data) {
+    switch (data.key) {
+      case 'createDate':
+        return fillTimeCell(data.value);
+      case 'updateDate':
+        return fillTimeCell(data.value);
+      case 'contacts':
+        return fillContactsCell(data.value);
+      default:
+        return fillCell(data.value);
+    }
+  }
+
   function fillCell(value) {
     const td = document.createElement('td');
     td.classList.add('table__cell');
@@ -377,11 +390,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     return td;
   }
 
+  function fillTimeCell(value) {
+    const td = document.createElement('td');
+    const date = document.createElement('span');
+    const time = document.createElement('span');
+
+    td.classList.add('table__cell', 'table__cell_time');
+    date.classList.add('date');
+    date.textContent = value.toLocaleDateString('ru');
+    time.classList.add('time');
+    time.textContent = value.toLocaleTimeString('ru');
+
+    td.append(date);
+    td.append(time);
+
+    return td;
+  }
+
   function fillContactsCell(contacts) {
     const td = document.createElement('td');
-    td.classList.add('table__cell');
+    td.classList.add('table__cell', 'table__cell_contacts');
     for (const contact of contacts) {
-      td.classList.add('table__cell_contacts');
       const icon = document.createElement('img');
       icon.src = getContactIcon(contact.type);
       icon.dataset.bsToggle = 'tooltip';
