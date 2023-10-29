@@ -176,6 +176,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const clientsModal = document.getElementById('clients-modal-form');
       const clientsModalInstance = bootstrap.Modal.getInstance(clientsModal);
 
+      const error = document.getElementById('error');
+      error.innerHTML = '';
+
       const id = document.getElementById('id').value;
       const lastName = document.getElementById('last-name').value.trim();
       const firstName = document.getElementById('first-name').value.trim();
@@ -183,11 +186,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       const contactsElements = Array.from(document.getElementsByClassName('contact__input-group'));
       const contacts = contactsElements.map((contact) => ({ type: contact.querySelector('.dropdown-toggle').textContent, value: contact.querySelector('.form-control').value.trim(), }));
 
-      const client = !id ? await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, }) : await updateClientInDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, });
-      await updateTableView();
-
+      try {
+        const client = !id ? await saveClientToDataBase({ id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, }) : await updateClientInDataBase({ _id: id, surname: lastName, name: firstName, lastName: secondName, contacts: contacts, });
+        await updateTableView();
+        clientsModalInstance.hide();
+      } catch (e) {
+        error.textContent = e;
+      }
       showClientSubmitSpinner(false);
-      clientsModalInstance.hide();
     });
   }
 
@@ -441,6 +447,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
     const newClient = await response.json();
+    if (!response.ok) throw new Error(`Error ${response.status}: ${newClient.message ?? 'Что-то пошло не так...'}`);
     return newClient;
   }
 
@@ -453,6 +460,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
     const updatedClient = await response.json();
+    if (!response.ok) throw new Error(`Error ${response.status}: ${updatedClient.message ?? 'Что-то пошло не так...'}`);
     return updatedClient;
   }
 
