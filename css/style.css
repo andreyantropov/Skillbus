@@ -4,6 +4,8 @@
   --error-color: #f06a4d;
   --error-light-color: #ff5d39;
   --grey-color: #c8c5d1;
+  --grey-light-color: #f4f3f6;
+  --grey-dark-color: #e7e5eb;
   --text-black: #333;
   --text-grey: #b0b0b0;
 }
@@ -108,9 +110,6 @@ body {
   border: 1px solid rgba(51, 51, 51, 0.20);
   width: 100%;
   height: 44px;
-  font-family: inherit;
-  font-size: 14px;
-  color: var(--text-grey);
 }
 
 .clients__wrapper {
@@ -195,6 +194,10 @@ body {
   flex-wrap: wrap;
 }
 
+.contact-tooltip {
+  color: var(--primary-color);
+}
+
 .table__cell-wrapper_actions {
   display: flex;
   gap: 30px;
@@ -276,6 +279,20 @@ body {
   border: none;
   border-bottom: 1px solid var(--text-grey);
   border-radius: 0;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-black);
+}
+
+.input__control::placeholder {
+  font-weight: 400;
+  color: var(--text-grey);
+}
+
+.input__label {
+  font-weight: 400;
+  color: var(--text-grey);
 }
 
 .input__control:required ~ .input__label::after {
@@ -303,12 +320,24 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px 0;
-  background-color: var(--text-grey);
+  margin: 0 -1rem;
+  padding: 8px 1rem;
+  background-color: var(--grey-light-color);
 }
 
-.btn-outline-secondary {
+.contacts__container {
+  width: 100%;
+}
+
+.contact__btn-dropdown {
   border: 1px solid var(--grey-color);
+  width: 27%;
+  background-color: var(--grey-dark-color);
+}
+
+.contact__dropdown {
+  border-radius: 0;
+  background-color: var(--grey-light-color);
 }
 
 .contact__control {
@@ -354,6 +383,7 @@ body {
   width: 60%;
   font-size: 10px;
   color: var(--error-color);
+  text-align: center;
 }
 
 .form__btn-container {
