@@ -441,8 +441,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       icon.classList.add('contact');
       icon.src = getContactIcon(contact.type);
       icon.dataset.bsToggle = 'tooltip';
-      icon.title = contact.value;
+      icon.dataset.bsPlacement = 'top';
+      icon.dataset.bsHtml = 'true';
+      icon.title = `${contact.type}: <strong class='contact-tooltip'>${contact.value}</strong>`;
       icon.alt = 'Контакт клиента';
+      const iconTooltip = new bootstrap.Tooltip(icon);
       wrapper.append(icon);
     }
 
