@@ -332,6 +332,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const td = document.createElement('td');
+    const wrapper = document.createElement('div');
     const editButton = document.createElement('button');
     const deleteButton = document.createElement('button');
     const editIcon = document.createElement('img');
@@ -339,6 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const deleteIcon = document.createElement('img');
 
     td.classList.add('table__cell', 'table__cell_actions');
+    wrapper.classList.add('table__cell-wrapper', 'table__cell-wrapper_actions');
     editIcon.src = 'img/edit.svg';
     editIcon.ariaHidden = true;
     deleteIcon.src = 'img/delete-client.svg';
@@ -370,8 +372,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       await deleteClient(client.id);
     });
 
-    td.append(editButton);
-    td.append(deleteButton);
+    wrapper.append(editButton);
+    wrapper.append(deleteButton);
+    td.append(wrapper);
     tr.append(td);
 
     return tr;
@@ -379,6 +382,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function preprocessingTableData(data) {
     switch (data.key) {
+      case 'id':
+        return fillIdCell(data.value);
       case 'createDate':
         return fillTimeCell(data.value);
       case 'updateDate':
@@ -397,34 +402,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     return td;
   }
 
+  function fillIdCell(value) {
+    const td = document.createElement('td');
+    td.classList.add('table__cell', 'table__cell_id');
+    td.textContent = value;
+    return td;
+  }
+
   function fillTimeCell(value) {
     const td = document.createElement('td');
+    const wrapper = document.createElement('div');
     const date = document.createElement('span');
     const time = document.createElement('span');
 
     td.classList.add('table__cell', 'table__cell_time');
+    wrapper.classList.add('table__cell-wrapper', 'table__cell-wrapper_time');
     date.classList.add('date');
     date.textContent = value.toLocaleDateString('ru');
     time.classList.add('time');
     time.textContent = value.toLocaleTimeString('ru');
 
-    td.append(date);
-    td.append(time);
+    wrapper.append(date);
+    wrapper.append(time);
+    td.append(wrapper);
 
     return td;
   }
 
   function fillContactsCell(contacts) {
     const td = document.createElement('td');
+    const wrapper = document.createElement('div');
+
     td.classList.add('table__cell', 'table__cell_contacts');
+    wrapper.classList.add('table__cell-wrapper', 'table__cell-wrapper_contacts');
+
     for (const contact of contacts) {
       const icon = document.createElement('img');
+      icon.classList.add('contact');
       icon.src = getContactIcon(contact.type);
       icon.dataset.bsToggle = 'tooltip';
       icon.title = contact.value;
       icon.alt = 'Контакт клиента';
-      td.append(icon);
+      wrapper.append(icon);
     }
+
+    td.append(wrapper);
     return td;
   }
 

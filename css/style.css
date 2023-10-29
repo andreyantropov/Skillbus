@@ -1,5 +1,8 @@
 :root {
   --primary-color: #9873ff;
+  --primary-light-color: #b89eff;
+  --error-color: #f06a4d;
+  --error-light-color: #ff5d39;
   --grey-color: #c8c5d1;
   --text-black: #333;
   --text-grey: #b0b0b0;
@@ -47,6 +50,12 @@ body {
   font-size: 14px;
   font-weight: 400;
   color: var(--text-black);
+  transition: 0.3s color, 0.3s background-color;
+}
+
+.icon,
+.icon__path {
+  transition: 0.3s fill, 0.3s stroke;
 }
 
 .hidden {
@@ -126,6 +135,10 @@ body {
   color: var(--text-grey);
 }
 
+.table__header-title_contacts {
+  min-width: 135px;
+}
+
 .table__header-title_sortable {
   cursor: pointer;
 }
@@ -159,17 +172,104 @@ body {
   height: 4rem;
 }
 
+.table__cell {
+  font-size: 14px;
+}
+
+.table__cell_id {
+  color: var(--text-grey);
+}
+
+.table__cell-wrapper_time {
+  display: flex;
+  gap: 10px;
+}
+
+.time {
+  color: var(--text-grey);
+}
+
+.table__cell-wrapper_contacts {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.table__cell-wrapper_actions {
+  display: flex;
+  gap: 30px;
+}
+
+.table__btn {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+@media (any-hover: hover) {
+  .table__btn_edit:hover {
+    color: var(--primary-color);
+  }
+}
+
+.table__btn_edit:active {
+  color: var(--primary-light-color);
+}
+
+@media (any-hover: hover) {
+  .table__btn_delete:hover {
+    color: var(--error-color);
+  }
+}
+
+.table__btn_delete:active {
+  color: var(--error-light-color);
+}
+
 .clients__button-container {
   display: flex;
   justify-content: center;
 }
 
 .clients__add-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   padding: 13px 26px;
   border: 1px solid var(--primary-color);
   font-size: 14px;
   font-weight: 600;
   color: var(--primary-color);
+}
+
+.icon__add-client {
+  width: 23px;
+  height: 16px;
+  fill: none;
+}
+
+.icon__path_add-client {
+  fill: var(--primary-color);
+}
+
+@media (any-hover: hover) {
+  .clients__add-btn:hover {
+    color: #fff;
+    background-color: var(--primary-color);
+  }
+
+  .clients__add-btn:hover .icon__path_add-client {
+    fill: #fff;
+  }
+}
+
+.clients__add-btn:active {
+  color: #fff;
+  background-color: var(--primary-light-color);
+}
+
+.clients__add-btn:active .icon__path_add-client {
+  fill: #fff;
 }
 
 .input__control {
@@ -204,7 +304,56 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 8px 0;
-  background-color: var(--grey-color);
+  background-color: var(--text-grey);
+}
+
+.btn-outline-secondary {
+  border: 1px solid var(--grey-color);
+}
+
+.contact__control {
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.contacts__add-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+}
+
+.icon__add-contact {
+  width: 16px;
+  height: 16px;
+  fill: none;
+}
+
+.icon__path_add-contact {
+  fill: var(--primary-color);
+}
+
+@media (any-hover: hover) {
+  .contacts__add-btn:hover {
+    color: var(--primary-color);
+  }
+}
+
+.contacts__add-btn:active {
+  color: var(--primary-light-color);
+}
+
+.contacts__add-btn:active .icon__path_add-contact {
+  fill: var(--primary-light-color);
+}
+
+.form__error {
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 10px;
+  width: 60%;
+  font-size: 10px;
+  color: var(--error-color);
 }
 
 .form__btn-container {
@@ -222,10 +371,33 @@ body {
   background-color: var(--primary-color);
 }
 
+@media (any-hover: hover) {
+  .form__btn-submit:hover {
+    color: #fff;
+    background-color: var(--primary-light-color);
+  }
+}
+
+.form__btn-submit:active {
+  color: #fff;
+  background-color: var(--primary-light-color);
+}
+
 .form__btn-submit .spinner-border {
   color: #fff;
 }
 
 .btn-link {
   color: var(--text-black);
+  transition: 0.3s color;
+}
+
+@media (any-hover: hover) {
+  .btn-link:hover {
+    color: var(--primary-color);
+  }
+}
+
+.btn-link:active {
+  color: var(--primary-light-color);
 }
