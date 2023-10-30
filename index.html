@@ -55,7 +55,7 @@
             </tbody>
           </table>
           <div class="clients__button-container">
-            <button class="clients__add-btn btn" id="add-client-btn">
+            <button class="clients__add-btn btn btn-outline" id="add-client-btn">
               <svg class="icon icon__add-client" viewBox="0 0 23 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path class="icon__path icon__path_add-client" d="M14.5 8C16.71 8 18.5 6.21 18.5 4C18.5 1.79 16.71 0 14.5 0C12.29 0 10.5 1.79 10.5 4C10.5 6.21 12.29 8 14.5 8ZM5.5 6V3H3.5V6H0.5V8H3.5V11H5.5V8H8.5V6H5.5ZM14.5 10C11.83 10 6.5 11.34 6.5 14V16H22.5V14C22.5 11.34 17.17 10 14.5 10Z"/>
               </svg>
@@ -72,7 +72,7 @@
       <div class="modal__dialog modal-dialog">
         <div class="modal__content modal-content">
           <div class="modal__header modal-header">
-            <h3 class="modal__title modal-title" id="modal-title">Новый клиент</h3>
+            <h3 class="modal__title modal-title" id="clients-form-title">Новый клиент</h3>
             <span class="modal__client-id" id="client-id-span"></span>
             <button class="modal__btn-close btn-close" type="button" data-bs-dismiss="modal" aria-label="Кнопка закрытия модального окна"></button>
           </div>
@@ -116,7 +116,7 @@
               <span class="form__error" id="error"></span>
 
               <div class="form__btn-container">
-                <button class="form__btn-submit btn" id="clients-submit-btn" type="submit">
+                <button class="form__btn-submit btn btn-primary" id="clients-submit-btn" type="submit">
                   <span class="spinner-border spinner-border-sm hidden" id="clients-submit-spinner" role="status" aria-hidden="true"></span>
                   Сохранить
                 </button>
@@ -133,15 +133,18 @@
     <div class="confirm__modal modal" id="confirm-modal" tabindex="-1">
       <div class="modal__dialog modal-dialog">
         <div class="modal__content modal-content">
-          <div class="modal__header modal-header">
+          <div class="modal__header modal-header text-center">
+            <h3 class="modal__title modal-title w-100" id="confirm-title">Новый клиент</h3>
             <button class="modal__btn-close btn-close" type="button" data-bs-dismiss="modal" aria-label="Кнопка закрытия окна подтверждения"></button>
           </div>
-          <div class="modal__body modal-body">
+          <div class="modal__body modal-body text-center">
             <p class="modal__message" id="confirm-message">Вы уверены?</p>
           </div>
           <div class="modal__footer modal-footer">
-            <button class="modal__btn-yes btn btn-primary" id="confirm-yes-btn" type="button" data-bs-dismiss="modal">Ок</button>
-            <button class="modal__btn-no btn btn-secondary" id="confirm-no-btn" type="button" data-bs-dismiss="modal">Отмена</button>
+            <div class="modal__footer-wrapper">
+              <button class="modal__btn-yes btn btn-primary" id="confirm-yes-btn" type="button" data-bs-dismiss="modal">Ок</button>
+              <button class="modal__btn-no btn-link btn-reset" id="confirm-no-btn" type="button" data-bs-dismiss="modal">Отмена</button>
+            </div>
           </div>
         </div>
       </div>

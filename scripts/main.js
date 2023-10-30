@@ -93,8 +93,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cancelButton = document.getElementById('confirm-no-btn');
 
     confirmModal.addEventListener('hidden.bs.modal', () => {
-      okBtn.removeEventListener('click');
-      cancelButton.removeEventListener('click');
+      okBtn.replaceWith(okBtn.cloneNode(true));
+      cancelButton.replaceWith(cancelButton.cloneNode(true));
     });
   }
 
@@ -226,21 +226,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function deleteClient(id) {
-    confirmDialog('Вы уверены?', async () => {
+    confirmDialog('Удалить клиента', 'Вы действительно хотите удалить данного клиента?', 'Удалить', 'Отмена', async () => {
       await deleteClientFromDataBase(id);
       await updateTableView();
      }, null);
   }
 
-  function confirmDialog(message = 'Вы уверены?', yesCallBack, noCallBack) {
+  function confirmDialog(title, message = 'Вы уверены?', yesText = 'Ок', noText = 'Отмена', yesCallBack, noCallBack) {
     const confirmModal = document.getElementById('confirm-modal');
     const confirmModalInstance = new bootstrap.Modal(confirmModal, {});
 
+    const titleElement = document.getElementById('confirm-title');
     const messageElement = document.getElementById('confirm-message');
     const yesBtn = document.getElementById('confirm-yes-btn');
     const noBtn = document.getElementById('confirm-no-btn');
 
+    titleElement.textContent = title;
     messageElement.textContent = message;
+    yesBtn.textContent = yesText;
+    noBtn.textContent = noText;
 
     yesBtn.addEventListener('click', yesCallBack);
     noBtn.addEventListener('click', noCallBack);
@@ -264,7 +268,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function showModalInInsertMode() {
-    document.getElementById('modal-title').textContent = 'Новый клиент';
+    document.getElementById('clients-form-title').textContent = 'Новый клиент';
     document.getElementById('client-id-span').textContent = '';
     document.getElementById('id').value = '';
     document.getElementById('modal-cancel-btn').textContent = 'Отмена';
@@ -273,7 +277,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function showModalInEditMode(client) {
     setHash(client.id);
 
-    document.getElementById('modal-title').textContent = 'Изменить данные';
+    document.getElementById('clients-form-title').textContent = 'Изменить данные';
     document.getElementById('client-id-span').textContent = `ID: ${client.id}`;
     document.getElementById('modal-cancel-btn').textContent = 'Удалить клиента';
 
