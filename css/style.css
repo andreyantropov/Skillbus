@@ -142,24 +142,21 @@ body {
   cursor: pointer;
 }
 
-.sorted::after {
-  content: "\2193";
-  padding-left: 5px;
-  color: var(--primary-color);
-}
-
-.sorted-reverse::after {
-  content: "\2191";
-  padding-left: 5px;
+.sorted,
+.sorted-reverse {
   color: var(--primary-color);
 }
 
 .sorted::after {
   content: "\2193 А-Я";
+  padding-left: 5px;
+  color: var(--primary-color);
 }
 
 .sorted-reverse::after {
-  content: "\2193 Я-А";
+  content: "\2191 Я-А";
+  padding-left: 5px;
+  color: var(--primary-color);
 }
 
 .spinner-container {

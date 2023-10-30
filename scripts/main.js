@@ -54,13 +54,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function prepareEvironment() {
-    createModalWindow();
+    createClientsModalFormWindow();
+    createConfirmModalWindow();
     addNewClientBtnOnClick();
     addClientsTableFiltration();
     addClientsTableSorting();
   }
 
-  function createModalWindow() {
+  function createClientsModalFormWindow() {
     const clientsModal = document.getElementById('clients-modal-form');
     const clientsModalInstance = new bootstrap.Modal(clientsModal, {});
     clientsModal.addEventListener('hidden.bs.modal', () => {
@@ -81,6 +82,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       const id = document.getElementById('id').value;
       if (!!id) await deleteClient(id);
       clientsModalInstance.hide();
+    });
+  }
+
+  function createConfirmModalWindow() {
+    const confirmModal = document.getElementById('confirm-modal');
+    const confirmModalInstance = new bootstrap.Modal(confirmModal, {});
+
+    const okBtn = document.getElementById('confirm-yes-btn');
+    const cancelButton = document.getElementById('confirm-no-btn');
+
+    confirmModal.addEventListener('hidden.bs.modal', () => {
+      okBtn.removeEventListener('click');
+      cancelButton.removeEventListener('click');
     });
   }
 
@@ -212,9 +226,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function deleteClient(id) {
-    if (!confirm('Вы уверены?')) return;
+    confirmDialog('Вы уверены?', async () => {
       await deleteClientFromDataBase(id);
       await updateTableView();
+     }, null);
+  }
+
+  function confirmDialog(message = 'Вы уверены?', yesCallBack, noCallBack) {
+    const confirmModal = document.getElementById('confirm-modal');
+    const confirmModalInstance = new bootstrap.Modal(confirmModal, {});
+
+    const messageElement = document.getElementById('confirm-message');
+    const yesBtn = document.getElementById('confirm-yes-btn');
+    const noBtn = document.getElementById('confirm-no-btn');
+
+    messageElement.textContent = message;
+
+    yesBtn.addEventListener('click', yesCallBack);
+    noBtn.addEventListener('click', noCallBack);
+
+    confirmModalInstance.show();
   }
 
   async function addNewClientBtnOnClick() {
