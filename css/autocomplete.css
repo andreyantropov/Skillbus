@@ -16,7 +16,7 @@
 .autocomplete-items div {
   padding: 10px;
   cursor: pointer;
-  background-color: #fff;
+  background-color: var(--light-color);
   border-bottom: 1px solid #d4d4d4;
 }
 
@@ -26,5 +26,5 @@
 
 .autocomplete-active {
   background-color: DodgerBlue !important;
-  color: #ffffff;
+  color: var(--light-color)fff;
 }

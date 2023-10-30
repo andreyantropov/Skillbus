@@ -6,8 +6,10 @@
   --grey-color: #c8c5d1;
   --grey-light-color: #f4f3f6;
   --grey-dark-color: #e7e5eb;
-  --text-black: #333;
-  --text-grey: #b0b0b0;
+  --text-black-color: #333;
+  --text-grey-color: #b0b0b0;
+  --background-color: #f5f5f5;
+  --light-color: #fff;
 }
 
 html {
@@ -31,7 +33,7 @@ img {
 
 body {
   font-family: 'Open Sans', sans-serif;
-  background: #f5f5f5;
+  background: var(--background-color);
 }
 
 .list-reset {
@@ -51,7 +53,7 @@ body {
   border-radius: 0;
   font-size: 14px;
   font-weight: 400;
-  color: var(--text-black);
+  color: var(--text-black-color);
   transition: 0.3s border, 0.3s color, 0.3s background-color;
 }
 
@@ -61,21 +63,21 @@ body {
   padding: 17px 35px;
   font-size: 14px;
   font-weight: 600;
-  color: #fff;
+  color: var(--light-color);
   background-color: var(--primary-color);
 }
 
 @media (any-hover: hover) {
   .btn-primary:hover {
     border: 1px solid var(--primary-light-color);
-    color: #fff;
+    color: var(--light-color);
     background-color: var(--primary-light-color);
   }
 }
 
 .btn-primary:active {
   border: 1px solid var(--primary-light-color);
-  color: #fff;
+  color: var(--light-color);
   background-color: var(--primary-light-color);
 }
 
@@ -89,13 +91,13 @@ body {
 
 @media (any-hover: hover) {
   .btn-outline:hover {
-    color: #fff;
+    color: var(--light-color);
     background-color: var(--primary-color);
   }
 }
 
 .btn-outline:active {
-  color: #fff;
+  color: var(--light-color);
   background-color: var(--primary-light-color);
 }
 
@@ -127,7 +129,7 @@ body {
 }
 
 .header {
-  background-color: #fff;
+  background-color: var(--light-color);
   box-shadow: 0px 3.38629px 5.64383px 0px rgba(176, 190, 197, 0.32), 0px 9.03012px 27.09036px 0px rgba(176, 190, 197, 0.32);
 }
 
@@ -164,25 +166,29 @@ body {
   margin-bottom: 18px;
   font-size: 24px;
   font-weight: 700;
-  color: var(--text-black);
+  color: var(--text-black-color);
 }
 
 .clients__table {
   margin-bottom: 40px;
-  background-color: #fff;
+  background-color: var(--light-color);
 }
 
 .table__header .table__header-title {
   border-bottom: none;
   font-size: 12px;
   font-weight: 400;
-  color: var(--text-grey);
-  background-color: #f5f5f5;
+  color: var(--text-grey-color);
+  background-color: var(--background-color);
   text-align: center;
 }
 
 .table__header-title_contacts {
   min-width: 135px;
+}
+
+.table__header-title_actions {
+  min-width: 110px;
 }
 
 .table__header-title_sortable {
@@ -220,7 +226,7 @@ body {
 }
 
 .table__cell_id {
-  color: var(--text-grey);
+  color: var(--text-grey-color);
 }
 
 .table__cell-wrapper_time {
@@ -229,7 +235,7 @@ body {
 }
 
 .time {
-  color: var(--text-grey);
+  color: var(--text-grey-color);
 }
 
 .table__cell-wrapper_contacts {
@@ -245,6 +251,7 @@ body {
 .table__cell-wrapper_actions {
   display: flex;
   gap: 25px;
+  flex-shrink: 1;
 }
 
 .table__btn {
@@ -296,12 +303,12 @@ body {
 
 @media (any-hover: hover) {
   .clients__add-btn:hover .icon__path_add-client {
-    fill: #fff;
+    fill: var(--light-color);
   }
 }
 
 .clients__add-btn:active .icon__path_add-client {
-  fill: #fff;
+  fill: var(--light-color);
 }
 
 .modal__header {
@@ -310,22 +317,22 @@ body {
 
 .input__control {
   border: none;
-  border-bottom: 1px solid var(--text-grey);
+  border-bottom: 1px solid var(--text-grey-color);
   border-radius: 0;
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-black);
+  color: var(--text-black-color);
 }
 
 .input__control::placeholder {
   font-weight: 400;
-  color: var(--text-grey);
+  color: var(--text-grey-color);
 }
 
 .input__label {
   font-weight: 400;
-  color: var(--text-grey);
+  color: var(--text-grey-color);
 }
 
 .input__control:required ~ .input__label::after {
@@ -337,12 +344,12 @@ body {
   margin-right: 10px;
   font-size: 18px;
   font-weight: 700;
-  color: var(--text-black);
+  color: var(--text-black-color);
 }
 
 .modal__client-id {
   font-size: 12px;
-  color: var(--text-grey);
+  color: var(--text-grey-color);
 }
 
 .form__contacts {
@@ -427,11 +434,11 @@ body {
 }
 
 .form__btn-submit .spinner-border {
-  color: #fff;
+  color: var(--light-color);
 }
 
 .btn-link {
-  color: var(--text-black);
+  color: var(--text-black-color);
   transition: 0.3s color;
 }
 
