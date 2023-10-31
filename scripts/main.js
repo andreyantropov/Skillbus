@@ -17,42 +17,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  async function updateTableView(filter) {
-    showTableSpinner();
-    await createDataSet(filter);
-    autocomplete(document.getElementById('filter'), autoCompleteList);
-    renderClientsTable(tableViewClientsList);
-  }
-
-  async function createDataSet(filter) {
-    clientsList = !!filter ? await searchClientsInDataBase(filter) : await getClientsFromDataBase();
-    tableViewClientsList = getViewClientsList(clientsList);
-    autoCompleteList = tableViewClientsList.map(client => client.name);
-  }
-
-  function showTableSpinner() {
-    const tr = document.createElement('tr');
-    const td = document.createElement('td');
-    const spinnerContainer = document.createElement('div');
-    const spinner = document.createElement('div');
-
-    tr.classList.add('table__row', 'table__row_loading');
-    td.classList.add('table__cell', 'table__cell_loading');
-    td.rowSpan = 3;
-    td.colSpan = 6;
-    spinnerContainer.classList.add('text-center', 'spinner-container');
-    spinner.classList.add('spinner-border');
-    spinner.role = 'status';
-
-    spinnerContainer.append(spinner);
-    td.append(spinnerContainer);
-    tr.append(td);
-
-    const table = document.getElementById('clients-table');
-    table.innerHTML = '';
-    table.append(tr);
-  }
-
   async function prepareEvironment() {
     createClientsModalFormWindow();
     addNewClientBtnOnClick();
@@ -79,8 +43,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cancelButton = document.getElementById('modal-cancel-btn');
     cancelButton.addEventListener('click', async () => {
       const id = document.getElementById('id').value;
-      if (!!id) await deleteClient(id);
-      clientsModalInstance.hide();
+      if (!!id) {
+        confirmDialog('Удалить клиента', 'Вы действительно хотите удалить данного клиента?', 'Удалить', 'Отмена', async (isConfirm) => {
+          if (isConfirm) {
+            await deleteClient(id);
+            clientsModalInstance.hide();
+          }
+         });
+      } else {
+        clientsModalInstance.hide();
+      }
     });
   }
 
@@ -147,7 +119,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const link = document.createElement('a');
 
       link.classList.add('dropdown-item');
-      link.href = '#';
       link.textContent = type;
 
       link.addEventListener('click', contactTypeOnClick);
@@ -212,12 +183,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function deleteClient(id) {
-    confirmDialog('Удалить клиента', 'Вы действительно хотите удалить данного клиента?', 'Удалить', 'Отмена', async (isConfirm) => {
-      if (isConfirm) {
-        await deleteClientFromDataBase(id);
-        await updateTableView();
-      }
-     });
+    await deleteClientFromDataBase(id);
+    await updateTableView();
   }
 
   function confirmDialog(title, message = 'Вы уверены?', yesText = 'Ок', noText = 'Отмена', callback) {
@@ -332,6 +299,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     await updateTableView(value);
   }
 
+  async function updateTableView(filter) {
+    showTableSpinner();
+    await createDataSet(filter);
+    autocomplete(document.getElementById('filter'), autoCompleteList);
+    renderClientsTable(tableViewClientsList);
+  }
+
+  async function createDataSet(filter) {
+    clientsList = !!filter ? await searchClientsInDataBase(filter) : await getClientsFromDataBase();
+    tableViewClientsList = getViewClientsList(clientsList);
+    autoCompleteList = tableViewClientsList.map(client => client.name);
+  }
+
+  function showTableSpinner() {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    const spinnerContainer = document.createElement('div');
+    const spinner = document.createElement('div');
+
+    tr.classList.add('table__row', 'table__row_loading');
+    td.classList.add('table__cell', 'table__cell_loading');
+    td.rowSpan = 3;
+    td.colSpan = 6;
+    spinnerContainer.classList.add('text-center', 'spinner-container');
+    spinner.classList.add('spinner-border');
+    spinner.role = 'status';
+
+    spinnerContainer.append(spinner);
+    td.append(spinnerContainer);
+    tr.append(td);
+
+    const table = document.getElementById('clients-table');
+    table.innerHTML = '';
+    table.append(tr);
+  }
+
   function getViewClientsList(clientsList) {
     return clientsList.map((client) => clientMapper(client));
   }
@@ -359,52 +362,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     for (const [key, value] of Object.entries(client)) {
       tr.append( preprocessingTableData( { key, value } ) );
     }
-
-    const td = document.createElement('td');
-    const wrapper = document.createElement('div');
-    const editButton = document.createElement('button');
-    const deleteButton = document.createElement('button');
-    const editIcon = document.createElement('img');
-    const editSpinner = document.createElement('span');
-    const deleteIcon = document.createElement('img');
-
-    td.classList.add('table__cell', 'table__cell_actions');
-    wrapper.classList.add('table__cell-wrapper', 'table__cell-wrapper_actions');
-    editIcon.src = 'img/edit.svg';
-    editIcon.ariaHidden = true;
-    deleteIcon.src = 'img/delete-client.svg';
-    deleteIcon.ariaHidden = true;
-    editSpinner.classList.add('spinner-border', 'spinner-border-sm', 'hidden');
-    editSpinner.role = 'status';
-    editSpinner.ariaHidden = true;
-    editButton.classList.add('table__btn', 'table__btn_edit', 'btn');
-    editButton.textContent = 'Изменить';
-    editButton.prepend(editIcon);
-    editButton.prepend(editSpinner);
-    deleteButton.classList.add('table__btn', 'table__btn_delete', 'btn');
-    deleteButton.textContent = 'Удалить';
-    deleteButton.prepend(deleteIcon);
-
-    function showEditBtnSpinner(isLoading) {
-      editButton.disabled = isLoading;
-      editIcon.classList.toggle('hidden');
-      editSpinner.classList.toggle('hidden');
-    }
-
-    editButton.addEventListener('click', async () => {
-      showEditBtnSpinner(true);
-      const rowClient = await getClientByIdFromDataBase(client.id);
-      await showModalWindow(rowClient);
-      showEditBtnSpinner(false);
-    });
-    deleteButton.addEventListener('click', async () => {
-      await deleteClient(client.id);
-    });
-
-    wrapper.append(editButton);
-    wrapper.append(deleteButton);
-    td.append(wrapper);
-    tr.append(td);
+    tr.append( fillActionsCell(client) );
 
     return tr;
   }
@@ -495,6 +453,74 @@ document.addEventListener('DOMContentLoaded', async () => {
       default:
         return 'img/contact.svg';
     }
+  }
+
+  function fillActionsCell(client) {
+    const td = document.createElement('td');
+    const wrapper = document.createElement('div');
+
+    td.classList.add('table__cell', 'table__cell_actions');
+    wrapper.classList.add('table__cell-wrapper', 'table__cell-wrapper_actions');
+
+    wrapper.append( createClientEditBtn(client) );
+    wrapper.append( createClientDeleteBtn(client) );
+    td.append(wrapper);
+
+    return td;
+  }
+
+  function createClientEditBtn(client) {
+    const editButton = document.createElement('button');
+    const editIcon = document.createElement('img');
+    const editSpinner = document.createElement('span');
+
+    editIcon.src = 'img/edit.svg';
+    editIcon.ariaHidden = true;
+
+    editSpinner.classList.add('spinner-border', 'spinner-border-sm', 'hidden');
+    editSpinner.role = 'status';
+    editSpinner.ariaHidden = true;
+    editButton.classList.add('table__btn', 'table__btn_edit', 'btn');
+    editButton.textContent = 'Изменить';
+    editButton.prepend(editIcon);
+    editButton.prepend(editSpinner);
+
+    function showEditBtnSpinner(isLoading) {
+      editButton.disabled = isLoading;
+      editIcon.classList.toggle('hidden');
+      editSpinner.classList.toggle('hidden');
+    }
+
+    editButton.addEventListener('click', async () => {
+      showEditBtnSpinner(true);
+      const rowClient = await getClientByIdFromDataBase(client.id);
+      await showModalWindow(rowClient);
+      showEditBtnSpinner(false);
+    });
+
+    return editButton;
+  }
+
+  function createClientDeleteBtn(client) {
+    const deleteButton = document.createElement('button');
+    const deleteIcon = document.createElement('img');
+
+    deleteIcon.src = 'img/delete-client.svg';
+    deleteIcon.ariaHidden = true;
+
+    deleteButton.classList.add('table__btn', 'table__btn_delete', 'btn');
+    deleteButton.textContent = 'Удалить';
+    deleteButton.prepend(deleteIcon);
+
+    deleteButton.addEventListener('click', async () => {
+      confirmDialog('Удалить клиента', 'Вы действительно хотите удалить данного клиента?', 'Удалить', 'Отмена', async (isConfirm) => {
+        if (isConfirm) {
+          await deleteClient(client.id);
+        }
+       });
+    });
+
+    return deleteButton;
   }
 
   function sortClientsTable(clientsList) {
