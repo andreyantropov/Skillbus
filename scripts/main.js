@@ -55,7 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function prepareEvironment() {
     createClientsModalFormWindow();
-    createConfirmModalWindow();
     addNewClientBtnOnClick();
     addClientsTableFiltration();
     addClientsTableSorting();
@@ -82,19 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const id = document.getElementById('id').value;
       if (!!id) await deleteClient(id);
       clientsModalInstance.hide();
-    });
-  }
-
-  function createConfirmModalWindow() {
-    const confirmModal = document.getElementById('confirm-modal');
-    const confirmModalInstance = new bootstrap.Modal(confirmModal, {});
-
-    const okBtn = document.getElementById('confirm-yes-btn');
-    const cancelButton = document.getElementById('confirm-no-btn');
-
-    confirmModal.addEventListener('hidden.bs.modal', () => {
-      okBtn.replaceWith(okBtn.cloneNode(true));
-      cancelButton.replaceWith(cancelButton.cloneNode(true));
     });
   }
 
@@ -226,13 +212,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function deleteClient(id) {
-    confirmDialog('Удалить клиента', 'Вы действительно хотите удалить данного клиента?', 'Удалить', 'Отмена', async () => {
-      await deleteClientFromDataBase(id);
-      await updateTableView();
-     }, null);
+    confirmDialog('Удалить клиента', 'Вы действительно хотите удалить данного клиента?', 'Удалить', 'Отмена', async (isConfirm) => {
+      if (isConfirm) {
+        await deleteClientFromDataBase(id);
+        await updateTableView();
+      }
+     });
   }
 
-  function confirmDialog(title, message = 'Вы уверены?', yesText = 'Ок', noText = 'Отмена', yesCallBack, noCallBack) {
+  function confirmDialog(title, message = 'Вы уверены?', yesText = 'Ок', noText = 'Отмена', callback) {
     const confirmModal = document.getElementById('confirm-modal');
     const confirmModalInstance = new bootstrap.Modal(confirmModal, {});
 
@@ -246,8 +234,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     yesBtn.textContent = yesText;
     noBtn.textContent = noText;
 
-    yesBtn.addEventListener('click', yesCallBack);
-    noBtn.addEventListener('click', noCallBack);
+    yesBtn.onclick = () => {
+      callback(true);
+      confirmModalInstance.hide();
+    };
+    noBtn.onclick = () => {
+      callback(false);
+      confirmModalInstance.hide();
+    };
 
     confirmModalInstance.show();
   }
