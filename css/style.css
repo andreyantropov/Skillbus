@@ -303,7 +303,7 @@ body {
   gap: 5px;
 }
 
-.icon__add-client {
+.icon_add-client {
   width: 23px;
   height: 16px;
   fill: none;
@@ -405,7 +405,7 @@ body {
   font-weight: 600;
 }
 
-.icon__add-contact {
+.icon_add-contact {
   width: 16px;
   height: 16px;
   fill: none;

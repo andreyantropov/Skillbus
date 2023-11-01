@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  const modalFormHandlers = {
+  const modalClientsFormHandlers = {
     OnShow( { addContactBtn: btn } ) {
       btn.disabled = checkContactsCount();
     },
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       container.append( createContact( { }, contactHandlers ) );
       btn.disabled = checkContactsCount();
     },
-    async OnSubmit( { form: form, modalInstance: instance,  } ) {
+    async OnSubmit( { form: form, modalInstance: instance, } ) {
         showClientSubmitSpinner(true);
 
         const error = document.getElementById('error');
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async OnEditBtnClick( { editBtn: btn, editIcon: icon, client: client, } ) {
       showEditBtnSpinner(true);
       const rowClient = await getClientByIdFromDataBase(client.id);
-      await showModalWindow(rowClient);
+      await showClientsModalForm(rowClient);
       showEditBtnSpinner(false);
 
       function showEditBtnSpinner(isLoading) {
@@ -94,18 +94,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function showHashUser() {
     if (window.location.hash) {
       const client = await getClientByIdFromDataBase(window.location.hash.substring(1));
-      await showModalWindow(client);
+      await showClientsModalForm(client);
     }
   }
 
   async function prepareEvironment() {
-    createClientsModalFormWindow(modalFormHandlers);
+    createClientsModalForm(modalClientsFormHandlers);
     addNewClientBtnOnClick();
     addClientsTableFiltration();
     addClientsTableSorting();
   }
 
-  function createClientsModalFormWindow( { OnShow, OnHide, OnAddContactBtnClick, OnSubmit, OnCancelBtnClick } ) {
+  function createClientsModalForm( { OnShow, OnHide, OnAddContactBtnClick, OnSubmit, OnCancelBtnClick } ) {
     const clientsModal = document.getElementById('clients-modal-form');
     const clientsModalInstance = new bootstrap.Modal(clientsModal, {});
     const clientsForm = document.getElementById('clients-form');
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const inputGroup = document.createElement('div');
     const dropdownBtn = document.createElement('button');
-    const dropdownMenu = createContactDropdownMenu(contactTypeOnChange);
+    const dropdownMenu = createContactDropdownMenu(OnContactTypeChange);
     const contactControl = document.createElement('input');
     const deleteBtn = document.createElement('button');
     const deleteIcon = document.createElement('img');
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     inputGroup.append(contactControl);
     inputGroup.append(deleteBtn);
 
-    function contactTypeOnChange(newContactType) {
+    function OnContactTypeChange(newContactType) {
       dropdownBtn.textContent = newContactType;
       contactControl.type = getContactControlType(newContactType);
     }
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return inputGroup;
   }
 
-  function createContactDropdownMenu(contactTypeOnChange) {
+  function createContactDropdownMenu(OnContactTypeChange) {
     const dropdownMenu = document.createElement('ul');
     dropdownMenu.classList.add('contact__dropdown', 'dropdown-menu');
 
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       link.textContent = type;
 
       link.addEventListener('click', (e) => {
-        contactTypeOnChange(e.target.textContent);
+        OnContactTypeChange(e.target.textContent);
       });
 
       item.append(link);
@@ -270,11 +270,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function addNewClientBtnOnClick() {
     const addButton = document.getElementById('add-client-btn');
     addButton.addEventListener('click', async () => {
-      await showModalWindow();
+      await showClientsModalForm();
     });
   }
 
-  async function showModalWindow(client) {
+  async function showClientsModalForm(client) {
     !!client ? await showModalInEditMode(client) : showModalInInsertMode();
 
     const clientsModal = document.getElementById('clients-modal-form');

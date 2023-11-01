@@ -23,7 +23,7 @@
     display: none;
   }
 
-  .table__wrapper {
+  .clients__table-wrapper {
     position: relative;
     margin: 0 -20px;
     padding: 20px;
