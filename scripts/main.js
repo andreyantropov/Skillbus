@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   const modalFormHandlers = {
+    OnShow( { addContactBtn: btn } ) {
+      btn.disabled = checkContactsCount();
+    },
     OnHide( { form: form, contactsContainer: container, } ) {
       removeHash();
       form.reset();
@@ -47,11 +50,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     OnCancelBtnClick( { cancelBtn: btn, modalInstance: instance, } ) {
       const id = document.getElementById('id').value;
       if (!!id) {
-        confirmDialog('Удалить клиента', 'Вы действительно хотите удалить данного клиента?', 'Удалить', 'Отмена', async (isConfirm) => {
-          if (isConfirm) {
+        confirmDialog('Удалить клиента', 'Вы действительно хотите удалить данного клиента?', 'Удалить', 'Отмена', {
+          OnConfirmOkBtnClick: async () => {
             await deleteClient(id);
             instance.hide();
-          }
+          },
+          OnConfirmCancelBtnClick: () => null,
         });
       } else {
         instance.hide();
@@ -73,11 +77,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     },
     OnDeleteBtnClick( { client: client, } ) {
-      confirmDialog('Удалить клиента', 'Вы действительно хотите удалить данного клиента?', 'Удалить', 'Отмена', async (isConfirm) => {
-        if (isConfirm) {
+      confirmDialog('Удалить клиента', 'Вы действительно хотите удалить данного клиента?', 'Удалить', 'Отмена', {
+        OnConfirmOkBtnClick: async () => {
           await deleteClient(client.id);
-        }
-        });
+        },
+        OnConfirmCancelBtnClick: () => null
+      });
     }
   };
 
@@ -100,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     addClientsTableSorting();
   }
 
-  function createClientsModalFormWindow( { OnHide, OnAddContactBtnClick, OnSubmit, OnCancelBtnClick } ) {
+  function createClientsModalFormWindow( { OnShow, OnHide, OnAddContactBtnClick, OnSubmit, OnCancelBtnClick } ) {
     const clientsModal = document.getElementById('clients-modal-form');
     const clientsModalInstance = new bootstrap.Modal(clientsModal, {});
     const clientsForm = document.getElementById('clients-form');
@@ -108,6 +113,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const addContactBtn = document.getElementById('add-contact-btn');
     const cancelButton = document.getElementById('modal-cancel-btn');
 
+    clientsModal.addEventListener('shown.bs.modal', () => {
+      OnShow( { addContactBtn: addContactBtn } );
+    });
     clientsModal.addEventListener('hidden.bs.modal', () => {
       OnHide( { form: clientsForm, contactsContainer: contactsContainer } );
     });
@@ -217,30 +225,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     await updateTableView();
   }
 
-  function confirmDialog(title, message = 'Вы уверены?', yesText = 'Ок', noText = 'Отмена', callback) {
+  function confirmDialog(title = 'Подтверждение', message = 'Вы уверены?', okCaption = 'Ок', cancelCaption = 'Отмена', { OnConfirmOkBtnClick, OnConfirmCancelBtnClick }) {
     const confirmModal = document.getElementById('confirm-modal');
     const confirmModalInstance = new bootstrap.Modal(confirmModal, {});
-
+    const btnContainer = document.getElementById('confirm-btn-container');
     const titleElement = document.getElementById('confirm-title');
     const messageElement = document.getElementById('confirm-message');
-    const yesBtn = document.getElementById('confirm-yes-btn');
-    const noBtn = document.getElementById('confirm-no-btn');
 
+    const okBtn = createOkBtn(okCaption, confirmModalInstance, OnConfirmOkBtnClick);
+    const cancelBtn = createCancelBtn(cancelCaption, confirmModalInstance, OnConfirmCancelBtnClick);
+
+    btnContainer.innerHTML = '';
     titleElement.textContent = title;
     messageElement.textContent = message;
-    yesBtn.textContent = yesText;
-    noBtn.textContent = noText;
 
-    yesBtn.onclick = () => {
-      callback(true);
-      confirmModalInstance.hide();
-    };
-    noBtn.onclick = () => {
-      callback(false);
-      confirmModalInstance.hide();
-    };
+    btnContainer.append(okBtn);
+    btnContainer.append(cancelBtn);
 
     confirmModalInstance.show();
+  }
+
+  function createOkBtn(caption, instance, OnClick) {
+    const okBtn = document.createElement('btn');
+    okBtn.classList.add('modal__btn-yes', 'btn', 'btn-primary');
+    okBtn.textContent = caption;
+    okBtn.addEventListener('click', () => {
+      OnClick();
+      instance.hide();
+    });
+    return okBtn;
+  }
+
+  function createCancelBtn(caption, instance, OnClick) {
+    const cancelBtn = document.createElement('btn');
+    cancelBtn.classList.add('"modal__btn-no', 'btn-link', 'btn-reset');
+    cancelBtn.textContent = caption;
+    cancelBtn.addEventListener('click', () => {
+      OnClick();
+      instance.hide();
+    });
+    return cancelBtn;
   }
 
   async function addNewClientBtnOnClick() {
