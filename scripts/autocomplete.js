@@ -1,4 +1,5 @@
 function autocomplete(inp, arr) {
+  const Keys = { Down: 30, Up: 38, Enter: 13, };
   let currentFocus;
 
   inp.addEventListener('input', function (e) {
@@ -30,13 +31,13 @@ function autocomplete(inp, arr) {
   inp.addEventListener('keydown', (e) => {
     const list = document.getElementById(this.id + 'autocomplete-list');
     if (list) list = list.getElementsByTagName('div');
-    if (e.keyCode === 40) {
+    if (e.keyCode === Keys.Down) {
       currentFocus++;
       addActive(list);
-    } else if (e.keyCode === 38) {
+    } else if (e.keyCode === Keys.Up) {
       currentFocus--;
       addActive(list);
-    } else if (e.keyCode === 13) {
+    } else if (e.keyCode === Keys.Enter) {
       e.preventDefault();
       if (currentFocus > -1) {
         if (list) list[currentFocus].click();

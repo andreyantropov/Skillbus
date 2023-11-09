@@ -1,4 +1,7 @@
 const url = 'http://localhost:3000';
+const Contacts = { Phone: 'Телефон', Email: 'Email', VK: 'VK', Facebook: 'Facebook', };
+const Fields = { Id: 'id', Name: 'name', CreateDate: 'createDate', UpdateDate: 'updateDate', Contacts: 'contacts', };
+const Columns = { Id: 'id-header', Name: 'name-header', CreateDate: 'create-date-header', UpdateDate: 'update-date-header', };
 
 document.addEventListener('DOMContentLoaded', async () => {
   let clientsList;
@@ -200,9 +203,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function getContactControlType(type) {
     switch (type) {
-      case 'Телефон':
+      case Contacts.Phone:
         return 'tel';
-      case 'Email':
+      case Contacts.Email:
         return 'email';
       default:
         return 'text';
@@ -423,13 +426,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function preprocessingTableData(data) {
     switch (data.key) {
-      case 'id':
+      case Fields.Id:
         return fillIdCell(data.value);
-      case 'createDate':
+      case Fields.CreateDate:
         return fillTimeCell(data.value);
-      case 'updateDate':
+      case Fields.UpdateDate:
         return fillTimeCell(data.value);
-      case 'contacts':
+      case Fields.Contacts:
         return fillContactsCell(data.value);
       default:
         return fillCell(data.value);
@@ -496,13 +499,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function getContactIcon(type) {
     switch (type) {
-      case 'Телефон':
+      case Contacts.Phone:
         return 'img/phone.svg';
-      case 'Email':
+      case Contacts.Email:
         return 'img/email.svg';
-      case 'VK':
+      case Contacts.VK:
         return 'img/vk.svg';
-      case 'Facebook':
+      case Contacts.Facebook:
         return 'img/facebook.svg';
       default:
         return 'img/contact.svg';
@@ -579,13 +582,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function bindSortValues(id) {
     switch (id) {
-      case 'id-header':
+      case Columns.Id:
         return 'id';
-      case 'name-header':
+      case Columns.Name:
         return 'name';
-      case 'create-date-header':
+      case Columns.CreateDate:
         return 'createDate';
-      case 'update-date-header':
+      case Columns.UpdateDate:
         return 'updateDate';
     }
   }
